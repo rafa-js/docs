@@ -1,0 +1,79 @@
+---
+title: Handcash Connect
+description: 'Integrate user wallets, trigger payments, and manage digital items with Handcash Connect.'
+---
+
+## Handcash Connect
+
+Enable users to connect their Handcash wallets to your application, trigger payments, and manage digital items on their behalf. Handcash Connect offers seamless integration of blockchain functionalities, enhancing your application's capabilities and user experience.
+
+![Connect User Wallet](/images/connectUser.png)
+*App authorization preview in the HandCash App*
+
+### Get Your App Credentials
+
+Before you begin, obtain your application credentials by following the [Getting Started with the Developer Dashboard](/developer-dashboard) guide. These credentials are essential for integrating Handcash services into your application.
+
+### Install the SDK
+
+To start using Handcash Connect, install the SDK via npm:
+
+```bash
+npm install @handcash/handcash-connect
+```
+
+### Import and Initialize the Module
+Import the Handcash Connect module and initialize it using your `appId` and `appSecret`
+
+```javascript
+import HandcashConnect from '@handcash/handcash-connect';
+
+const handCashConnect = new HandcashConnect({
+  appId: 'YOUR_APP_ID',
+  appSecret: 'YOUR_APP_SECRET',
+});
+
+// Initialize Handcash Connect
+handCashConnect.initialize();
+```
+
+### Redirect the User to Handcash for Authorization
+Generate the authorization URL and redirect the user to Handcash to authorize your application
+
+```javascript
+const redirectionLoginUrl = handCashConnect.getRedirectionUrl();
+```
+
+### Initialize the User Account
+
+After the user authorizes your application, initialize their account using the authentication token:
+```javascript
+const account = handCashConnect.getAccountFromAuthToken('<authToken>');
+```
+
+### Get the User Profile
+Retrieve the user's public profile information
+```javascript
+const { publicProfile } = await account.profile.getCurrentProfile();
+
+console.log(`Hey @${publicProfile.handle}, welcome to my app!`);
+```
+
+### Make a Payment
+Initiate a payment from the user's wallet:
+
+```javascript
+const payParameters = {
+  payments: [
+    {
+      destination: 'handcashteam',
+      currencyCode: 'USD',
+      sendAmount: 0.10,
+    },
+  ],
+};
+
+const paymentResult = await account.wallet.pay(payParameters);
+console.log({ paymentResult });
+```
+

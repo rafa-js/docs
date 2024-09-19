@@ -2,50 +2,40 @@
   "$schema": "https://mintlify.com/schema.json",
   "name": "Starter Kit",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo/hcmarket_overDark.svg",
+    "light": "/logo/hcmarket_overLight.svg"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
+    "primary": "#57ff97",
     "light": "#07C983",
     "dark": "#0D9373",
     "anchors": {
-      "from": "#0D9373",
+      "from": "#57ff97",
       "to": "#07C983"
     }
   },
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "url": "mailto:Support@handcash.io"
     }
   ],
   "topbarCtaButton": {
-    "name": "Dashboard",
-    "url": "https://dashboard.mintlify.com"
+    "name": "Developer Dashboard",
+    "url": "https://dashboard.handcash.io"
   },
-  "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
+  "tabs": [],
   "anchors": [
     {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
-    },
-    {
       "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
+      "icon": "discord",
+      "url": "https://discord.gg/aKpjBgAh"
     },
     {
       "name": "Blog",
       "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
+      "url": "https://market.handcash.io/blog"
     }
   ],
   "navigation": [
@@ -53,19 +43,17 @@
       "group": "Get Started",
       "pages": [
         "introduction",
-        "quickstart",
-        "development"
+        "developer-dashboard"
       ]
     },
     {
-      "group": "Essentials",
+      "group": "Products",
       "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
+        "products/handcash-connect",
+        "products/handcash-items",
+        "products/handcash-wallet-service",
+        "products/handcash-business-wallet",
+        "products/handcash-pay"
       ]
     },
     {
@@ -75,17 +63,16 @@
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "Use Cases",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "useCases/items-minter",
+        "useCases/external-wallet-demo"
       ]
     }
   ],
   "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "x": "https://twitter.com/handcashapp",
+    "github": "https://github.com/HandCash",
+    "linkedin": "https://www.linkedin.com/company/handcash"
   }
 }
