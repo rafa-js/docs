@@ -1,5 +1,5 @@
 ---
-title: Handcash Connect
+title: Getting Started
 description: 'Integrate user wallets, trigger payments, and manage digital items with Handcash Connect.'
 ---
 
@@ -32,9 +32,6 @@ const handCashConnect = new HandcashConnect({
   appId: 'YOUR_APP_ID',
   appSecret: 'YOUR_APP_SECRET',
 });
-
-// Initialize Handcash Connect
-handCashConnect.initialize();
 ```
 
 ### Redirect the User to Handcash for Authorization
@@ -43,37 +40,3 @@ Generate the authorization URL and redirect the user to Handcash to authorize yo
 ```javascript
 const redirectionLoginUrl = handCashConnect.getRedirectionUrl();
 ```
-
-### Initialize the User Account
-
-After the user authorizes your application, initialize their account using the authentication token:
-```javascript
-const account = handCashConnect.getAccountFromAuthToken('<authToken>');
-```
-
-### Get the User Profile
-Retrieve the user's public profile information
-```javascript
-const { publicProfile } = await account.profile.getCurrentProfile();
-
-console.log(`Hey @${publicProfile.handle}, welcome to my app!`);
-```
-
-### Make a Payment
-Initiate a payment from the user's wallet:
-
-```javascript
-const payParameters = {
-  payments: [
-    {
-      destination: 'handcashteam',
-      currencyCode: 'USD',
-      sendAmount: 0.10,
-    },
-  ],
-};
-
-const paymentResult = await account.wallet.pay(payParameters);
-console.log({ paymentResult });
-```
-

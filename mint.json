@@ -47,24 +47,48 @@
       ]
     },
     {
-      "group": "Products",
+      "group": "Handcash Connect",
       "pages": [
-        "products/handcash-connect",
-        "products/handcash-items",
-        "products/handcash-wallet-service",
-        "products/handcash-business-wallet",
-        "products/handcash-pay"
+        "handcash-connect/getting-started",
+        "handcash-connect/account",
+        "handcash-connect/wallet"
       ]
     },
     {
-      "group": "API Documentation",
+      "group": "Items",
       "pages": [
-        "api-reference/introduction"
+        "handcash-items/getting-started",
+        "handcash-items/craft-items",
+        "handcash-items/webhooks"
       ]
     },
     {
-      "group": "Use Cases",
+      "group": "Business Wallet",
       "pages": [
+        "business-wallet/getting-started"
+      ]
+    },
+    {
+      "group": "Handcash Pay",
+      "pages": [
+        "handcash-pay/getting-started",
+        "handcash-pay/create-payment-request",
+        "handcash-pay/manage-payment-request",
+        "handcash-pay/webhooks"
+      ]
+    },
+    {
+      "group": "Wallet as a Service",
+      "pages": [
+        "waas/getting-started",
+        "waas/create-user-account",
+        "waas/pay"
+      ]
+    },
+    {
+      "group": "Use Cases and Examples",
+      "pages": [
+        "useCases/sell-items-in-shop",
         "useCases/items-minter",
         "useCases/external-wallet-demo"
       ]
