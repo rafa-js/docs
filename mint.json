@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "HandCash Developer Documentation",
   "logo": {
     "dark": "/logo/handcash_overDark.svg",
     "light": "/logo/handcash_overLight.svg"
