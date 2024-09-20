@@ -58,6 +58,8 @@
       "group": "Items",
       "pages": [
         "handcash-items/getting-started",
+        "handcash-items/create-items",
+        "handcash-items/manage-items",
         "handcash-items/craft-items",
         "handcash-items/webhooks"
       ]
@@ -82,13 +84,16 @@
       "pages": [
         "waas/getting-started",
         "waas/create-user-account",
-        "waas/pay"
+        "waas/manage-wallets",
+        "waas/configure-paymail",
+        "waas/custom-verification-email"
       ]
     },
     {
       "group": "Use Cases and Examples",
       "pages": [
-        "useCases/sell-items-in-shop",
+        "useCases/open-card-pack",
+        "useCases/sell-items",
         "useCases/items-minter",
         "useCases/external-wallet-demo"
       ]

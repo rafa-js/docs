@@ -1,0 +1,85 @@
+---
+title: Getting Started
+description: 'Manage and trade digital items within your application using HandCash Items'
+---
+
+# Introduction to HandCash Items
+
+HandCash Items leverages the 1Sat ordinal token protocol on BSV to create, manage, and trade digital items. It's designed to abstract blockchain complexities, allowing developers to focus on building their applications without needing in-depth blockchain knowledge.
+
+## Setting Up Credentials
+
+1. Create an application using the [HandCash Developer Dashboard](/developer-dashboard).
+   - Save your `AppId` and `AppSecret`.
+2. Set up a [Business Wallet](/business-wallet/getting-started).
+   - Save your `AccessToken`.
+
+## Item Creation Orders
+
+HandCash Items supports two types of creation orders:
+1. Collection creation orders
+2. Collection item creation orders
+
+It's recommended to create a single global collection for your application and use item `traits` to distinguish between different sub-collections.
+
+Item creation orders inscribe items on the blockchain in the background, typically taking less than 5 seconds to complete. You can configure a webhook URL in the app dashboard to receive notifications when your item creation orders are completed.
+
+### Item Creation Order Response
+
+Here's the TypeScript interface for the item creation order response:
+
+```typescript
+interface ItemCreationOrderResponse {
+  id: string;
+  user: string; // Your business wallet ID
+  app: string;
+  referencedCollection: string;
+  type: 'collection' | 'collectionItem';
+  status: 'pending' | 'completed' | 'failed';
+  pendingInscriptions: number;
+  error?: string;
+}
+```
+
+## Creating a Collection
+
+To create a collection, use the following code and save your `collectionId` for future item creation:
+
+```typescript
+import { HandCashMinter, Types } from "@handcash/handcash-connect";
+
+const handCashMinter = HandCashMinter.fromAppCredentials({
+  appId: handCashConfig.appId,
+  authToken: handCashConfig.authToken,
+  appSecret: handCashConfig.appSecret,
+});
+
+async function createCollection() {
+  const collection: Types.CreateCollectionOrder = {
+    name: 'HandCash Team Caricatures',
+    description: 'A unique collection of caricatures of the HandCash team',
+    mediaDetails: {
+      image: {
+        url: 'https://res.cloudinary.com/handcash-iae/image/upload/v1685141160/round-handcash-logo_cj47fp_xnteyo_oy3nbd.png',
+        contentType: 'image/png',
+      },
+    },
+  };
+
+  const creationOrder = await handCashMinter.createCollectionOrder(collection);
+  
+  // Wait for collection to be created in the background
+  await new Promise(resolve => setTimeout(resolve, 5000));
+  
+  const items = await handCashMinter.getOrderItems(creationOrder.id);
+  console.log(`Collection Created. ID: ${items[0].id}`);
+}
+
+(async () => {
+  try {
+    await createCollection();
+  } catch (error) {
+    console.error('Error creating collection:', error);
+  }
+})();
+```

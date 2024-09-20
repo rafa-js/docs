@@ -1,0 +1,160 @@
+---
+title: Manage Wallets
+description: 'Get Balance, Transaction History and Pay from created wallets'
+---
+
+This guide covers how to manage wallets, including getting deposit methods, checking balances, making payments, and viewing transaction history.
+
+## Get Deposit Methods
+
+To retrieve account information and deposit methods:
+
+```javascript
+const account = walletService.getWalletAccountFromAuthToken(keyPair.privateKey);
+const accountInfo = await account.getDepositInfo();
+console.log(accountInfo);
+```
+
+This will return an object with the following structure:
+
+```javascript
+{
+  "id": "63b4cdab6d9bbb40a077c31d",
+  "paymail": "jack@lamint.io",
+  "alias": "jack",
+  "base58Address": "16HcSyxRkCDS9omL6kLxrPkM7q9KZm9apA",
+}
+```
+
+You can use the following deposit methods:
+- `id` or `alias` to send from other wallets using our SDK.
+- `paymail` to send P2P from other BSV wallets that support this protocol.
+- `base58Address` to send from any BSV wallet or exchange.
+
+## Get Wallet Balance
+
+To check the wallet balance:
+
+```javascript
+const account = walletService.getWalletAccountFromAuthToken(keyPair.privateKey);
+const balance = await account.wallet.getTotalBalance();
+console.log(balance);
+```
+
+The response will look like this:
+
+```javascript
+{
+  "items": [
+    {
+      "currency": {
+        "code": "BSV",
+        "logoUrl": "https://res.cloudinary.com/hn8pdtayf/image/upload/v1721318886/54b1047685c48c267bc7b8183af42954.jpg",
+        "symbol": ""
+      },
+      "units": 0.20801351,
+      "fiatEquivalent": {
+        "currencyCode": "USD",
+        "units": 9.18837276372
+      }
+    }
+  ]
+}
+```
+
+## Make a Payment
+
+
+```javascript
+const account = walletService.getWalletAccountFromAuthToken(keyPair.privateKey);
+const accountInfo = await account.getDepositInfo();
+const paymentParameters = {
+  note: 'Sending to myself',
+  currencyCode: 'BSV',
+  denominatedIn: 'USD',
+  receivers: [
+    { destination: depositInfo.paymail, amount: 0.01 },
+    // You can add multiple receivers
+  ]
+};
+const paymentResult = await account.wallet.pay(paymentParameters);
+console.log(paymentResult);
+```
+
+The payment result will look like this:
+
+```javascript
+{
+    "transactionId": "c6df6b9ea763ace4dccc94d244717c07295c3c52bd54ea9d1a66e21eede852b5",
+    "note": "",
+    "type": "send",
+    "time": 1726070984,
+    "units": 0.00019879,
+    "satoshiFees": 0,
+    "fiatEquivalent": {
+        "currencyCode": "USD",
+        "units": 0.009999812886000001
+    },
+    "currency": {
+        "code": "BSV",
+        "logoUrl": "",
+        "symbol": "BSV"
+    },
+    "participants": [
+        {
+            "type": "user",
+            "id": "612cba70e108780b4f6817ad",
+            "alias": "rafa",
+            "displayName": "Rafa Jimenez",
+            "profilePictureUrl": "https://res.cloudinary.com/handcash-iae/image/upload/v1712916589/ccfdc5631f145c1ceb4a305754812d3f.jpg",
+            "avatarMetadata": {},
+            "responseNote": "",
+            "tags": []
+        }
+    ],
+    "attachments": [],
+}
+```
+
+## Get Wallet Payments
+
+To retrieve the wallet's payment history:
+
+```javascript
+const account = walletService.getWalletAccountFromAuthToken(keyPair.privateKey);
+const payments = await account.wallet.getPaymentHistory({ from: 0, to: 5 });
+console.log(payments);
+```
+
+The response will include an array of payment objects:
+
+```javascript
+{
+  "from": 0,
+  "to": 5,
+  "items": [
+    {
+      "transactionId": "917674cbea0f14bbe24c1a9a6f967763a499c4a3a9f20e9bbc1bad8a152a5357",
+      "note": "External deposit",
+      "type": "receive",
+      "time": 1716311894,
+      "currencyCode": "BSV",
+      "currencyUnits": 0.0154,
+      "fiatEquivalent": {
+        "currencyCode": "USD",
+        "units": 1.0826816
+      },
+      "participants": [
+        {
+          "type": "user",
+          "id": "641f16f0365bc7609e582352",
+          "alias": "rjseibane",
+          "profilePictureUrl": "https://cloud.handcash.io/v2/users/profilePicture/rjseibane",
+          "tags": []
+        }
+      ]
+    }
+    // More payments here
+  ]
+}
+```
