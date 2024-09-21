@@ -7,7 +7,7 @@ description: 'The `Wallet` class provides methods to interact with user wallets 
 
 ### getSpendableBalance(currencyCode?)
 
-Checks the user's spendable balance.  The user authorizes the amount an app can spend daily by default this value is $10 per day. Users can adjust this limit at https://market.handcash.io
+Checks the user's spendable balance. The user authorizes the amount an app can spend daily; by default, this value is $10 per day. Users can adjust this limit in the HandCash Market.
 
 ```typescript
 async getSpendableBalance(currencyCode?: CurrencyCode): Promise<SpendableBalance>
@@ -92,16 +92,17 @@ console.log(`Payment successful. Transaction ID: ${result.transactionId}`);
 type PaymentParameters = {
   description?: string;
   appAction?: string;
-  payments: PaymentRequestItem[];
+  payments: Receiver[];
   attachment?: Attachment;
 };
 
-type PaymentRequestItem = {
+type Receiver = {
   destination: string;
   currencyCode: CurrencyCode;
   sendAmount: number;
   tags?: string[];
 };
+
 ```
 
 **PaymentResult Type:**
@@ -119,6 +120,18 @@ type PaymentResult = {
   participants: TransactionParticipant[];
   attachments: Attachment[];
   rawTransactionHex: string;
+};
+
+type Attachment = {
+  format: string;
+  value: string;
+};
+
+type TransactionParticipant = {
+  type: string;
+  handle: string;
+  displayName: string;
+  profilePictureUrl: string;
 };
 ```
 

@@ -17,7 +17,7 @@ description: 'Manage payments to and from your business'
    In the dashboard, go to the **Wallets** section.
 
 3. **Create a New Wallet:**  
-   Click on the **Create Wallet** button and follow the prompts to set up your business wallet.
+   Click on the **Create Wallet** button and follow the prompts to set up your business wallet. Once 2fA is completed, save the wallet `AccessToken` to be used in the next steps.
 
 ### Manage Payouts
 
@@ -31,12 +31,12 @@ const handCashConnect = new HandcashConnect({
   appSecret: 'YOUR_APP_SECRET',
 });
 
-const account = handCashConnect.getAccountFromAuthToken('<authToken>');
+const account = handCashConnect.getAccountFromAuthToken('<accessToken>');
 
 const payParameters = {
   payments: [
     {
-      destination: 'myUser',
+      destination: '<RECIPIENT_HANDLE | WALLET_ID>',
       currencyCode: 'USD',
       sendAmount: 0.10,
     },
