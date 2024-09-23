@@ -72,7 +72,8 @@
         "handcash-items/create-items",
         "handcash-items/manage-items",
         "handcash-items/craft-items",
-        "handcash-items/webhooks"
+        "handcash-items/webhooks",
+        "handcash-items/market"
       ]
     },
     {
