@@ -47,6 +47,17 @@
       ]
     },
     {
+      "group": "Wallet as a Service",
+      "pages": [
+        "waas/getting-started",
+        "waas/create-user-account",
+        "waas/manage-wallets",
+        "waas/configure-paymail",
+        "waas/custom-verification-email",
+        "waas/on-ramps"
+      ]
+    },
+    {
       "group": "Handcash Connect",
       "pages": [
         "handcash-connect/getting-started",
@@ -71,22 +82,12 @@
       ]
     },
     {
-      "group": "Handcash Pay",
+      "group": "Payment Requests",
       "pages": [
         "handcash-pay/getting-started",
         "handcash-pay/create-payment-request",
         "handcash-pay/manage-payment-request",
         "handcash-pay/webhooks"
-      ]
-    },
-    {
-      "group": "Wallet as a Service",
-      "pages": [
-        "waas/getting-started",
-        "waas/create-user-account",
-        "waas/manage-wallets",
-        "waas/configure-paymail",
-        "waas/custom-verification-email"
       ]
     },
     {
