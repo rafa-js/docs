@@ -158,3 +158,17 @@ The response will include an array of payment objects:
   ]
 }
 ```
+
+Available payment filters 
+
+```typescript 
+export type PaymentFilters = {
+	from: number;
+	to: number;
+	type: 'send' | 'receive';
+	fromDate: string;
+	toDate: string;
+	participant: string;
+	tag: string;
+};
+```
