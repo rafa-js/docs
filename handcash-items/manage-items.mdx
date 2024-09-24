@@ -48,8 +48,6 @@ type GetItemsFilter = {
   sort?: 'name';
   order?: 'asc' | 'desc';
   attributes?: AttributeFilter[];
-  isHandcashCreated?: boolean;
-  isVerified?: boolean;
   appId?: string;
   group?: boolean;
   externalId?: string;
@@ -136,6 +134,5 @@ console.log('Transaction ID:', result.transactionId);
 - The `group` parameter in filters returns items grouped by `groupingValue`, useful for large inventories.
 - `externalId` can be used to map items to your application's reference system.
 - For item transfers, ensure your application has the necessary permissions and is the creator of the item.
-- Use `isHandcashCreated` and `isVerified` filters to check the authenticity of items.
 
 For more detailed information on item management and advanced features, refer to the HandCash Items API documentation.

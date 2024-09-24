@@ -42,7 +42,6 @@ async function createItems() {
         mediaDetails: {
           image: {
             url: "https://res.cloudinary.com/handcash-iae/image/upload/v1702398977/items/jyn2qqyqyepqhqi9p661.webp",
-            imageHighResUrl: "https://res.cloudinary.com/handcash-iae/image/upload/v1697465892/items/zq0lupxoj8id1uedgz2h.png",
             contentType: "image/webp"
           }
         },
@@ -115,7 +114,7 @@ export type ItemAttributeMetadata = {
 ## Important Notes
 
 - If `user` is not provided, items will be issued to the business's wallet.
-- `quantity` specifies how many items to mint.
+- `quantity` specifies how many items to mint (100 items per order).
 - `externalId` is an optional ID that can be used later to look up a particular item.
 - `uid` is an optional string that you can use to look up the status of a particular order.
 - `multimedia` can be used to pass a .glb 3d file url, you will also need to pass a image.url for a thumbnail
@@ -136,7 +135,6 @@ const creationOrder = await handCashMinter.createItemsOrder({
       mediaDetails: {
         image: {
           url: "https://res.cloudinary.com/handcash-iae/image/upload/v1702398977/items/jyn2a2yqyepqhqi9p661.webp",
-          imageHighResUrl: "https://res.cloudinary.com/handcash-iae/image/upload/v1702398977/items/jyn2a2yqyepqhqi9p661.png",
           contentType: "image/png"
         }
       },

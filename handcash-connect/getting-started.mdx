@@ -64,7 +64,7 @@ At HandCash, the user will see a prompt asking them to grant permissions to your
 
 ### 3. Handle the Redirection Back to Your App
 
-After the user makes a selection, they will be redirected back to your app's Authorization Success URL or Authorization Failed URL, which you specified in your app settings.
+After the user makes a selection, they will be redirected back to your app's Authorization Success URL or Authorization Failed URL, which you specified in your [app settings](https://dashboard.handcash.io).
 
 - If the user **accepts**, they will be redirected to:
   ```
@@ -123,3 +123,9 @@ const redirectionLoginUrl = handCashConnect.getRedirectionUrl({ state: 'xyz' });
 3. **HandCash Redirects Back to Your App:** After authorization, HandCash redirects the user back to your specified success or failure URL, including the authToken if successful.
 4. **Your App Uses the authToken:** Use the authToken to initialize the user's account with the HandCash Connect SDK.
 5. **Interact with the User's Account:** Utilize the SDK to access user data and perform actions on their behalf.
+
+## App Gallery 
+
+Complete the app submission form in [Developer Dashboard](https://dashboard.handcash.io) to be included in the Handcash App Gallery
+
+![App Gallery](/images/app-gallery.png)
