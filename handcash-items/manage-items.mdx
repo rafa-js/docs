@@ -53,6 +53,13 @@ type GetItemsFilter = {
   externalId?: string;
 };
 
+export type AttributeFilter = {
+	name: string;
+	displayType: 'string' | 'number';
+	operation: 'equal' | 'greater' | 'lower';
+	value: string | number;
+};
+
 // Example: Filter items from a specific collection with attributes
 const params: GetItemsFilter = {
   from: 0,
