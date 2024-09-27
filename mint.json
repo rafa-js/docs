@@ -5,7 +5,7 @@
     "dark": "/logo/handcash_overDark.svg",
     "light": "/logo/handcash_overLight.svg"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.ico",
   "colors": {
     "primary": "#57ff97",
     "light": "#07C983",
