@@ -47,14 +47,14 @@
       ]
     },
     {
-      "group": "Wallet as a Service",
+      "group": "Wallet API",
       "pages": [
-        "waas/getting-started",
-        "waas/create-user-account",
-        "waas/manage-wallets",
-        "waas/configure-paymail",
-        "waas/custom-verification-email",
-        "waas/on-ramps"
+        "wallet-api/getting-started",
+        "wallet-api/create-user-account",
+        "wallet-api/manage-wallets",
+        "wallet-api/configure-paymail",
+        "wallet-api/custom-verification-email",
+        "wallet-api/on-ramps"
       ]
     },
     {
