@@ -51,6 +51,7 @@
       "pages": [
         "wallet-api/getting-started",
         "wallet-api/create-user-account",
+        "wallet-api/create-authorization-for-existing-account",
         "wallet-api/manage-wallets",
         "wallet-api/configure-paymail",
         "wallet-api/custom-verification-email",
