@@ -60,6 +60,25 @@ async function createItems() {
 createItems().catch(console.error);
 ```
 
+### Creating items with 3D renders
+
+Use the following media details structure to include a GLB file to represent your item.
+
+```typescript
+{
+    mediaDetails: {
+        image: {
+            url: 'https://server.com/assets/7ffa34b14f853e0d007d87284fae9b64.png',
+            contentType: 'image/png',
+        },
+        multimedia: {
+            url: 'https://server.com/assets/3e9ec7f87d31c19fb6389b1298d681c2.glb',
+            contentType: 'application/glb',
+        }
+    },
+}
+```
+
 ## Types
 
 Here are the TypeScript types for creating items:
@@ -113,12 +132,17 @@ export type ItemAttributeMetadata = {
 
 ## Important Notes
 
-- If `user` is not provided, items will be issued to the business's wallet.
-- `quantity` specifies how many items to mint (100 items per order).
-- `externalId` is an optional ID that can be used later to look up a particular item.
-- `uid` is an optional string that you can use to look up the status of a particular order.
-- `multimedia` can be used to pass a .glb 3d file url, you will also need to pass a image.url for a thumbnail
-- You must use the proper `displayType` for filters in the handcash market to work properly
+* If `user` is not provided, items will be issued to the business's wallet.
+
+* `quantity` specifies how many items to mint (100 items per order).
+
+* `externalId` is an optional ID that can be used later to look up a particular item.
+
+* `uid` is an optional string that you can use to look up the status of a particular order.
+
+* `multimedia` can be used to pass a .glb 3d file url, you will also need to pass a image.url for a thumbnail
+
+* You must use the proper `displayType` for filters in the handcash market to work properly
 
 ## Item Actions
 
@@ -154,7 +178,9 @@ const creationOrder = await handCashMinter.createItemsOrder({
 ### Handling Item Actions
 
 1. When a user executes an action, they will be redirected to the URL specified in the action with query parameters: `?itemOrigin=<string>&authToken=<string>`.
+
 2. Capture these parameters in your application.
+
 3. Use the `authToken` to leverage the HandCash Connect SDK for operations like transferring items, crafting and burning items, or transferring money.
 
 An example use case will be illustrated in [crafting items](/handcash-items/craft-items)
