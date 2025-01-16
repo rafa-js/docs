@@ -45,33 +45,6 @@ await storeAuthenticationKey(keyPair.privateKey);
 const account = walletService.getWalletAccountFromAuthToken(keyPair.privateKey);
 ```
 
-
-## Get access to an existing wallet
-
-```javascript
-import { WalletService, Crypto } from '@handcash/sdk';
-
-const walletService = new WalletService({
-	appId: '<YOUR-APP-ID>',
-	appSecret: '<YOUR-APP-SECRET>',
-});
-
-// Request email verification code
-const requestId = await walletService.requestSignInEmailCode(email);
-
-// Verify email code
-const verificationCode = '01234567';
-const keyPair = Crypto.generateAuthenticationKeyPair();
-await walletService.verifyEmailCode(requestId, verificationCode, keyPair.publicKey);
-await walletService.activateAccessKey(keyPair.publicKey, email);
-
-// Store the authentication key in a secure place so the user can access the wallet later
-await storeAuthenticationkey(keyPair.privateKey);
-
-// Get access to the wallet account
-const account = walletService.getWalletAccountFromAuthToken(keyPair.privateKey);
-```
-
 ## Sequence Diagram
 
 The following sequence diagram illustrates the wallet creation process:
