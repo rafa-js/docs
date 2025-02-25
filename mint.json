@@ -47,18 +47,6 @@
       ]
     },
     {
-      "group": "Wallet API",
-      "pages": [
-        "wallet-api/getting-started",
-        "wallet-api/create-user-account",
-        "wallet-api/create-authorization-for-existing-account",
-        "wallet-api/manage-wallets",
-        "wallet-api/configure-paymail",
-        "wallet-api/custom-verification-email",
-        "wallet-api/on-ramps"
-      ]
-    },
-    {
       "group": "Handcash Connect",
       "pages": [
         "handcash-connect/getting-started",
@@ -90,6 +78,18 @@
         "handcash-pay/create-payment-request",
         "handcash-pay/manage-payment-request",
         "handcash-pay/webhooks"
+      ]
+    },
+    {
+      "group": "Wallet API",
+      "pages": [
+        "wallet-api/getting-started",
+        "wallet-api/create-user-account",
+        "wallet-api/create-authorization-for-existing-account",
+        "wallet-api/manage-wallets",
+        "wallet-api/configure-paymail",
+        "wallet-api/custom-verification-email",
+        "wallet-api/on-ramps"
       ]
     },
     {
