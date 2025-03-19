@@ -136,6 +136,29 @@ const externalResult = await account.items.transfer({
 console.log('Transaction ID:', result.transactionId);
 ```
 
+## Lock items
+
+You can prevent an item from being transferred by locking it.
+
+```typescript
+const origin = '0a3eb965a039cb15e731e2b1b2a67b7c024e6a6b59c1f7c32a9cec1d6b5bb7e7_48';
+await account.items.lockItems(origin);
+```
+
+Later on, you can unlock it as follows.
+
+```typescript
+const origin = '0a3eb965a039cb15e731e2b1b2a67b7c024e6a6b59c1f7c32a9cec1d6b5bb7e7_48';
+await account.items.unlockItems(origin);
+```
+
+You can also get the list of locked items.
+```typescript
+const lockedItems = await account.items.getLockedItems({
+  from: 0, to: 10, fetchAttributes: true,
+});
+```
+
 ## Important Notes
 
 - The `group` parameter in filters returns items grouped by `groupingValue`, useful for large inventories.
