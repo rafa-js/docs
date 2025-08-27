@@ -1,0 +1,19 @@
+---
+title: Read Inventory
+description: 'Read user inventory (pending v3 endpoints)'
+---
+
+<Note>
+Pending v3: example uses legacy package.
+</Note>
+
+```typescript
+import { HandCashConnect } from '@handcash/handcash-connect';
+
+const connect = new HandCashConnect({ appId, appSecret });
+const account = connect.getAccountFromAuthToken('<AUTH_TOKEN>');
+const items = await account.items.getItemsInventory({ searchString: '', limit: 50 });
+console.log(items);
+```
+
+

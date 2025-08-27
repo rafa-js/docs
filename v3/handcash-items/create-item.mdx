@@ -1,0 +1,22 @@
+---
+title: Create an Item
+description: 'Mint new items (pending v3 endpoints)'
+---
+
+<Note>
+Pending v3: example uses legacy package.
+</Note>
+
+```typescript
+import { HandCashMinter } from '@handcash/handcash-connect';
+
+const minter = HandCashMinter.fromAppCredentials({ appId, appSecret, authToken });
+await minter.createCollectionItemOrder({
+  referencedCollection: '<COLLECTION_ID>',
+  name: 'Sword of Truth',
+  attributes: { season: '1', rarity: 'legendary' },
+  mediaDetails: { image: { url: 'https://.../sword.png', contentType: 'image/png' } },
+});
+```
+
+

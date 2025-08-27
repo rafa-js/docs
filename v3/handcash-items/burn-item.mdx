@@ -1,0 +1,20 @@
+---
+title: Burn an Item
+description: 'Permanently destroy items (pending v3 endpoints)'
+---
+
+<Note>
+Pending v3: example uses legacy package.
+</Note>
+
+```typescript
+import { HandCashConnect } from '@handcash/handcash-connect';
+
+const connect = new HandCashConnect({ appId, appSecret });
+const account = connect.getAccountFromAuthToken('<AUTH_TOKEN>');
+await account.items.burnItems({
+  items: [{ id: '<ITEM_ID>' }],
+});
+```
+
+

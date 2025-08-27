@@ -1,0 +1,57 @@
+---
+title: Setup
+description: 'Manage payments to and from your business'
+---
+
+![Business Wallet](/images/businesswallet.png)
+
+
+## Getting Started
+
+### Create a Business Wallet
+
+1. **Access the Developer Dashboard:**  
+   Visit the [Handcash Developer Dashboard](https://dashboard.handcash.io) and log in with your developer credentials.
+
+2. **Navigate to Wallets:**  
+   In the dashboard, go to the **Wallets** section.
+
+3. **Create a New Wallet:**  
+   Click on the **Create Wallet** button and follow the prompts to set up your business wallet. Once 2fA is completed, save the wallet `AccessToken` to be used in the next steps.
+
+### Manage Payouts
+
+Once your wallet is set up, you can manage payouts using the HandCash SDK v3.
+
+A common use case is for hourly payouts from the business wallet to the top of the leader board.
+
+With your Access Token, you can integrate the HandCash SDK to trigger user payouts.
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'YOUR_APP_ID',
+  appSecret: 'YOUR_APP_SECRET',
+});
+
+const client = sdk.getAccountClient('<accessToken>');
+
+const { data, error } = await Connect.pay({
+  client,
+  body: {
+    instrumentCurrencyCode: 'BSV',
+    denominationCurrencyCode: 'USD',
+    receivers: [
+      {
+        destination: '<RECIPIENT_HANDLE | WALLET_ID>',
+        sendAmount: 0.10,
+      },
+    ],
+  },
+});
+
+if (error) throw error;
+console.log({ paymentResult: data });
+```
+

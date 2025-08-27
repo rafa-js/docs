@@ -1,0 +1,33 @@
+---
+title: 'Configure Paymail Domain (Optional)'
+---
+
+Enable your users' wallets to be addressable by `alias@<yourdomain.com>` from other wallets in the BSV ecosystem by configuring a custom paymail domain.
+
+## Step 1: Add SRV Record
+
+Add an SRV record to your domain's DNS settings with the following details:
+
+- **Type:** SRV Record
+- **Name:** `_bsvalias._tcp`
+- **Value:** `10 10 443 cloud.handcash.io`
+
+## Step 2: Enable DNSSEC
+
+Enable DNSSEC for your domain. This is typically done through your domain registrar or DNS provider's settings.
+
+## Step 3: Update Paymail Domain
+
+1. Go to the [HandCash developer dashboard](https://dashboard.handcash.io/)
+2. Navigate to the Paymail domain settings
+3. Update your Paymail domain configuration
+
+After completing these steps, your domain should be properly configured for Paymail use with HandCash Wallet as a Service.
+
+## Example Configuration
+
+Here's an example of how to configure the SRV record using NameCheap.com:
+
+![Example](/images/namecheap_DNS_example.png)
+
+**Note:** The exact steps may vary depending on your domain registrar or DNS provider. Consult their documentation for specific instructions on adding SRV records and enabling DNSSEC.
