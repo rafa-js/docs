@@ -47,6 +47,53 @@
       ]
     },
     {
+      "group": "v3 / Business Wallet",
+      "pages": [
+        "v3/business-wallet/getting-started"
+      ]
+    },
+    {
+      "group": "v3 / User Connection",
+      "pages": [
+        "v3/handcash-connect/getting-started",
+        "v3/handcash-connect/permissions",
+        "v3/handcash-connect/profile",
+        "v3/handcash-connect/friends",
+        "v3/handcash-connect/read-balance"
+      ]
+    },
+    {
+      "group": "v3 / Item Engine",
+      "pages": [
+        "v3/handcash-items/getting-started",
+        "v3/handcash-items/collection-management",
+        "v3/handcash-items/create-item",
+        "v3/handcash-items/send-item",
+        "v3/handcash-items/burn-item",
+        "v3/handcash-items/read-inventory"
+      ]
+    },
+    {
+      "group": "v3 / Embedded Payments",
+      "pages": [
+        "v3/embedded-payments/getting-started",
+        "v3/embedded-payments/send",
+        "v3/embedded-payments/connect-limit"
+      ]
+    },
+    {
+      "group": "v3 / Payment Requests",
+      "pages": [
+        "v3/handcash-pay/getting-started"
+      ]
+    },
+    {
+      "group": "v3 / Store Integration",
+      "pages": [
+        "v3/wallet-api/getting-started"
+      ]
+    },
+    {
       "group": "Handcash Connect",
       "pages": [
         "handcash-connect/getting-started",
