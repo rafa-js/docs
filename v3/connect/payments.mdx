@@ -1,0 +1,189 @@
+---
+title: Payments
+description: 'Send and receive payments with Handcash Connect'
+---
+
+## Suggested Prerequisites
+- User authentication completed
+- Business wallet setup (for payouts)
+- Payment processing infrastructure
+- Error handling system
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate payments from the v3 SDK: https://docs.handcash.io/v3/connect/payments
+```
+
+## Send a Payment
+
+### Basic Payment
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({ appId, appSecret });
+const client = sdk.getAccountClient(authToken);
+
+const { data, error } = await Connect.pay({
+  client,
+  body: {
+    instrumentCurrencyCode: 'BSV',
+    denominationCurrencyCode: 'USD',
+    receivers: [
+      {
+        destination: 'recipient-handle',
+        sendAmount: 0.01
+      }
+    ]
+  }
+});
+
+if (error) {
+  console.error('Payment failed:', error);
+} else {
+  console.log('Payment successful:', data);
+}
+```
+
+### Payment with Description
+
+```typescript
+const { data, error } = await Connect.pay({
+  client,
+  body: {
+    instrumentCurrencyCode: 'BSV',
+    denominationCurrencyCode: 'USD',
+    description: 'Payment for services',
+    receivers: [
+      {
+        destination: 'recipient-handle',
+        sendAmount: 10.00
+      }
+    ]
+  }
+});
+```
+
+### Multiple Recipients
+
+```typescript
+const { data, error } = await Connect.pay({
+  client,
+  body: {
+    instrumentCurrencyCode: 'BSV',
+    denominationCurrencyCode: 'USD',
+    receivers: [
+      { destination: 'user1', sendAmount: 5.00 },
+      { destination: 'user2', sendAmount: 3.00 },
+      { destination: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa', sendAmount: 2.00 }
+    ]
+  }
+});
+```
+
+## Check Balances
+
+### Get Spendable Balance
+
+```typescript
+const { data: balances } = await Connect.getSpendableBalances({ client });
+console.log('Spendable balances:', balances);
+```
+
+### Get All Balances
+
+```typescript
+const { data: allBalances } = await Connect.getBalances({ client });
+console.log('All balances:', allBalances);
+```
+
+## Exchange Rates
+
+```typescript
+const { data: rate } = await Connect.getExchangeRate({
+  client: sdk.client, // Use static client for exchange rates
+  path: { currencyCode: 'USD' }
+});
+console.log('USD exchange rate:', rate);
+```
+
+## Get Payment Details
+
+```typescript
+const { data: payment } = await Connect.getPaymentDetails({
+  client,
+  path: { transactionId: 'transaction-id' }
+});
+console.log('Payment details:', payment);
+```
+
+## Error Handling
+
+```typescript
+try {
+  const { data, error } = await Connect.pay({
+    client,
+    body: { /* payment details */ }
+  });
+  
+  if (error) {
+    switch (error.code) {
+      case 'INSUFFICIENT_FUNDS':
+        console.log('User has insufficient funds');
+        break;
+      case 'INVALID_DESTINATION':
+        console.log('Invalid recipient address');
+        break;
+      case 'PERMISSION_DENIED':
+        console.log('User denied payment permission');
+        break;
+      default:
+        console.log('Payment failed:', error.message);
+    }
+  }
+} catch (err) {
+  console.error('Unexpected error:', err);
+}
+```
+
+## Common Use Cases
+
+### Tipping System
+
+```typescript
+async function sendTip(recipientHandle: string, amount: number) {
+  const { data, error } = await Connect.pay({
+    client,
+    body: {
+      instrumentCurrencyCode: 'BSV',
+      denominationCurrencyCode: 'USD',
+      description: 'Tip',
+      receivers: [{ destination: recipientHandle, sendAmount: amount }]
+    }
+  });
+  
+  return { success: !error, data, error };
+}
+```
+
+### Batch Payments
+
+```typescript
+async function sendBatchPayments(recipients: Array<{handle: string, amount: number}>) {
+  const { data, error } = await Connect.pay({
+    client,
+    body: {
+      instrumentCurrencyCode: 'BSV',
+      denominationCurrencyCode: 'USD',
+      description: 'Batch payment',
+      receivers: recipients.map(r => ({
+        destination: r.handle,
+        sendAmount: r.amount
+      }))
+    }
+  });
+  
+  return { success: !error, data, error };
+}
+```

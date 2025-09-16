@@ -1,0 +1,57 @@
+---
+title: Getting Started
+description: 'Create payment requests that users can fulfill with QR codes or links'
+---
+
+## Setup
+
+To get started with Payment Requests:
+
+1. Create an application in the [Developer Dashboard](/developer-dashboard)
+
+2. Save your `AppSecret` and `AppId` for later use
+
+3. Install the Handcash SDK in your project:
+
+```
+npm install @handcash/sdk
+```
+
+## Overview
+
+Payment Requests allow you to generate QR codes and payment links that users can scan or click to make payments. This is perfect for:
+
+- **E-commerce checkout** - Generate payment links for online purchases
+- **In-person payments** - Display QR codes for point-of-sale transactions
+- **Donations** - Create shareable donation links
+- **Marketplace transactions** - Handle payments between users
+
+## Basic Usage
+
+```typescript
+import { getInstance } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'your-app-id',
+  appSecret: 'your-app-secret'
+});
+
+// Create a payment request
+const paymentRequest = await sdk.createPaymentRequest({
+  amount: 10.00,
+  currency: 'USD',
+  description: 'Payment for services',
+  redirectUrl: 'https://yoursite.com/payment-success'
+});
+
+console.log('Payment URL:', paymentRequest.paymentUrl);
+console.log('QR Code:', paymentRequest.qrCode);
+```
+
+## Key Features
+
+- **QR Code Generation** - Automatic QR code creation for mobile scanning
+- **Payment Links** - Shareable URLs for web and mobile payments
+- **Webhook Support** - Real-time payment notifications
+- **Multiple Currencies** - Support for USD, BSV, and other currencies
+- **Custom Branding** - White-label payment experience

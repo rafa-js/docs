@@ -1,0 +1,45 @@
+---
+title: 'Configure Custom Verification Email (Optional)'
+---
+
+You can enhance your user experience by customizing the verification email template. This guide explains how to implement a custom email template for the sign-up process.
+
+## Implementation
+
+To use a custom email template, pass an options object as the second argument to the `requestSignUpEmailCode` function. This object should contain an `html` property with your custom HTML string.
+
+### Key Points:
+
+1. Pass `{ html: string }` as the second argument to `requestSignUpEmailCode`.
+2. In your HTML string, use the literal `{code}` where you want the verification code to appear.
+3. The verification server will automatically replace `{code}` with the actual verification code.
+
+## Example
+
+Here's an example of how to implement a custom verification email:
+
+```javascript
+const customHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to My Application</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .code { font-size: 24px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to My Application!</h1>
+  <p>Your verification code is: <span class="code">{code}</span></p>
+  <p>Enter this code to complete your registration. It will expire in 15 minutes.</p>
+</body>
+</html>
+`;
+
+export async function requestSignUpEmailCode(email: string, html: string) {
+    return walletService.requestSignUpEmailCode(email, { html });
+}
+```

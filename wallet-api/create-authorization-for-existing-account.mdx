@@ -1,0 +1,34 @@
+---
+title: Get access to an existing Wallet
+---
+
+This process is very similar to [creating a new user account](/wallet-api/create-user-account), but simplified for existing users.
+
+```javascript
+import { WalletService, Crypto } from '@handcash/sdk';
+
+const walletService = new WalletService({
+    appId: '<YOUR-APP-ID>',
+    appSecret: '<YOUR-APP-SECRET>',
+});
+
+// Request email verification code
+const email = 'user@example.com';
+const requestId = await walletService.requestSignInEmailCode(email);
+
+// Verify email code
+const verificationCode = '01234567'; // Code entered by user
+const keyPair = Crypto.generateAuthenticationKeyPair();
+await walletService.verifyEmailCode(requestId, verificationCode, keyPair.publicKey);
+
+// Activate access for existing user
+await walletService.activateAccessKey(keyPair.publicKey, email);
+
+// Store the authentication key securely
+await storeAuthenticationKey(keyPair.privateKey);
+
+// Get access to the wallet
+const account = walletService.getWalletAccountFromAuthToken(keyPair.privateKey);
+```
+
+The main difference from creating a new user is that we use `activateAccessKey()` instead of `createWalletAccount()`, since the wallet already exists.

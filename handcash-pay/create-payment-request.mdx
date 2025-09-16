@@ -1,0 +1,126 @@
+---
+title: Create Payment Request
+description: 'Generate payment requests with QR codes and payment links'
+---
+
+## Create Basic Payment Request
+
+```typescript
+import { getInstance } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'your-app-id',
+  appSecret: 'your-app-secret'
+});
+
+const paymentRequest = await sdk.createPaymentRequest({
+  amount: 25.00,
+  currency: 'USD',
+  description: 'Payment for premium subscription',
+  redirectUrl: 'https://yoursite.com/payment-success',
+  cancelUrl: 'https://yoursite.com/payment-cancelled'
+});
+
+console.log('Payment URL:', paymentRequest.paymentUrl);
+console.log('QR Code Data:', paymentRequest.qrCode);
+console.log('Request ID:', paymentRequest.id);
+```
+
+## Payment Request with Items
+
+```typescript
+const paymentRequest = await sdk.createPaymentRequest({
+  amount: 50.00,
+  currency: 'USD',
+  description: 'Purchase digital items',
+  items: [
+    {
+      name: 'Premium Sword',
+      description: 'Legendary weapon',
+      quantity: 1,
+      price: 30.00
+    },
+    {
+      name: 'Health Potion',
+      description: 'Restores 100 HP',
+      quantity: 2,
+      price: 10.00
+    }
+  ],
+  redirectUrl: 'https://yoursite.com/purchase-success'
+});
+```
+
+## Custom Payment Request
+
+```typescript
+const paymentRequest = await sdk.createPaymentRequest({
+  amount: 100.00,
+  currency: 'USD',
+  description: 'Custom payment request',
+  customData: {
+    orderId: 'ORDER-12345',
+    customerId: 'CUST-67890',
+    metadata: {
+      source: 'mobile-app',
+      campaign: 'summer-sale'
+    }
+  },
+  redirectUrl: 'https://yoursite.com/order-complete',
+  cancelUrl: 'https://yoursite.com/order-cancelled',
+  expiresAt: new Date(Date.now() + 30 * 60 * 1000) // 30 minutes
+});
+```
+
+## Display QR Code
+
+```typescript
+// Generate QR code for display
+const qrCodeData = paymentRequest.qrCode;
+
+// In your frontend
+<img src={`data:image/png;base64,${qrCodeData}`} alt="Payment QR Code" />
+
+// Or use a QR code library
+import QRCode from 'qrcode';
+
+const qrCodeUrl = await QRCode.toDataURL(paymentRequest.paymentUrl);
+```
+
+## Payment Request Response
+
+```typescript
+{
+  "id": "pr_123456789",
+  "paymentUrl": "https://pay.handcash.io/pr_123456789",
+  "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+  "amount": 25.00,
+  "currency": "USD",
+  "description": "Payment for premium subscription",
+  "status": "pending",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "expiresAt": "2024-01-15T11:00:00Z"
+}
+```
+
+## Error Handling
+
+```typescript
+try {
+  const paymentRequest = await sdk.createPaymentRequest({
+    amount: 25.00,
+    currency: 'USD',
+    description: 'Payment request'
+  });
+} catch (error) {
+  if (error.code === 'INVALID_AMOUNT') {
+    console.log('Amount must be greater than 0');
+  } else if (error.code === 'INVALID_CURRENCY') {
+    console.log('Currency not supported');
+  } else if (error.code === 'INVALID_REDIRECT_URL') {
+    console.log('Redirect URL must be HTTPS');
+  } else {
+    console.log('Payment request creation failed:', error.message);
+  }
+}
+```

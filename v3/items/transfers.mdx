@@ -1,0 +1,279 @@
+---
+title: Item Transfers
+description: 'Transfer items between users and manage item ownership'
+---
+
+## Suggested Prerequisites
+- User authentication completed
+- Item ownership verification
+- Transfer permission system
+- External wallet integration
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate item transfers from the v3 SDK: https://docs.handcash.io/v3/items/transfers
+```
+
+## Transfer Items
+
+### Transfer to Handcash User
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({ appId, appSecret });
+const client = sdk.getAccountClient(authToken);
+
+// Transfer single item
+const { data: result } = await Connect.transferItem({
+  client,
+  body: {
+    itemOrigin: 'item-origin-id',
+    destination: 'recipient-handle'
+  }
+});
+
+console.log('Transfer successful:', result.transactionId);
+```
+
+### Transfer Multiple Items
+
+```typescript
+const { data: result } = await Connect.transferItem({
+  client,
+  body: {
+    itemOrigins: [
+      'item-origin-1',
+      'item-origin-2',
+      'item-origin-3'
+    ],
+    destination: 'recipient-handle'
+  }
+});
+```
+
+### Transfer to External Wallet
+
+```typescript
+const { data: result } = await Connect.transferItem({
+  client,
+  body: {
+    itemOrigin: 'item-origin-id',
+    destination: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa' // Bitcoin address
+  }
+});
+```
+
+## Lock and Unlock Items
+
+### Lock Items
+
+```typescript
+const { data: result } = await Connect.lockItems({
+  client,
+  body: {
+    itemOrigins: ['item-origin-1', 'item-origin-2']
+  }
+});
+
+console.log('Items locked:', result);
+```
+
+### Unlock Items
+
+```typescript
+const { data: result } = await Connect.unlockItems({
+  client,
+  body: {
+    itemOrigins: ['item-origin-1', 'item-origin-2']
+  }
+});
+
+console.log('Items unlocked:', result);
+```
+
+### Get Locked Items
+
+```typescript
+const { data: lockedItems } = await Connect.getLockedItems({
+  client,
+  body: {
+    from: 0,
+    to: 20,
+    fetchAttributes: true
+  }
+});
+
+console.log(`User has ${lockedItems.length} locked items`);
+```
+
+## Common Use Cases
+
+### Gift Items
+
+```typescript
+async function giftItem(authToken: string, itemOrigin: string, recipientHandle: string) {
+  const client = sdk.getAccountClient(authToken);
+  
+  try {
+    const { data: result } = await Connect.transferItem({
+      client,
+      body: {
+        itemOrigin,
+        destination: recipientHandle
+      }
+    });
+    
+    return {
+      success: true,
+      transactionId: result.transactionId,
+      message: `Item sent to ${recipientHandle}`
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+```
+
+### Trade Items
+
+```typescript
+async function tradeItems(
+  user1Token: string, 
+  user2Token: string, 
+  user1Items: string[], 
+  user2Items: string[]
+) {
+  const client1 = sdk.getAccountClient(user1Token);
+  const client2 = sdk.getAccountClient(user2Token);
+  
+  // Transfer user1's items to user2
+  const transfer1 = await Connect.transferItem({
+    client: client1,
+    body: {
+      itemOrigins: user1Items,
+      destination: 'user2-handle' // Get from user2's profile
+    }
+  });
+  
+  // Transfer user2's items to user1
+  const transfer2 = await Connect.transferItem({
+    client: client2,
+    body: {
+      itemOrigins: user2Items,
+      destination: 'user1-handle' // Get from user1's profile
+    }
+  });
+  
+  return {
+    user1Transaction: transfer1.data.transactionId,
+    user2Transaction: transfer2.data.transactionId
+  };
+}
+```
+
+### Lock Valuable Items
+
+```typescript
+async function lockValuableItems(authToken: string) {
+  const client = sdk.getAccountClient(authToken);
+  
+  // Get user's inventory
+  const { data: items } = await Connect.getItemsInventory({
+    client,
+    body: { limit: 100 }
+  });
+  
+  // Find legendary/epic items
+  const valuableItems = items.filter(item => 
+    ['Legendary', 'Epic'].includes(item.rarity)
+  );
+  
+  if (valuableItems.length > 0) {
+    const { data: result } = await Connect.lockItems({
+      client,
+      body: {
+        itemOrigins: valuableItems.map(item => item.origin)
+      }
+    });
+    
+    console.log(`Locked ${valuableItems.length} valuable items`);
+    return result;
+  }
+}
+```
+
+### Batch Transfer
+
+```typescript
+async function batchTransfer(
+  authToken: string, 
+  transfers: Array<{itemOrigin: string, destination: string}>
+) {
+  const client = sdk.getAccountClient(authToken);
+  const results = [];
+  
+  for (const transfer of transfers) {
+    try {
+      const { data: result } = await Connect.transferItem({
+        client,
+        body: {
+          itemOrigin: transfer.itemOrigin,
+          destination: transfer.destination
+        }
+      });
+      
+      results.push({
+        success: true,
+        itemOrigin: transfer.itemOrigin,
+        transactionId: result.transactionId
+      });
+    } catch (error) {
+      results.push({
+        success: false,
+        itemOrigin: transfer.itemOrigin,
+        error: error.message
+      });
+    }
+  }
+  
+  return results;
+}
+```
+
+## Error Handling
+
+```typescript
+try {
+  const { data: result } = await Connect.transferItem({
+    client,
+    body: {
+      itemOrigin: 'item-origin-id',
+      destination: 'recipient-handle'
+    }
+  });
+} catch (error) {
+  if (error.message.includes('Item not found')) {
+    console.log('Item does not exist or user does not own it');
+  } else if (error.message.includes('Invalid destination')) {
+    console.log('Recipient handle or address is invalid');
+  } else if (error.message.includes('Item locked')) {
+    console.log('Item is locked and cannot be transferred');
+  } else if (error.message.includes('Permission denied')) {
+    console.log('User needs transfer permission');
+  }
+}
+```
+
+## Best Practices
+
+- **Validate ownership** before transferring items
+- **Check item locks** before attempting transfers
+- **Use batch operations** for multiple transfers
+- **Handle errors gracefully** with user-friendly messages
+- **Log transactions** for audit purposes
+- **Confirm transfers** with users before executing

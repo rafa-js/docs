@@ -1,0 +1,170 @@
+---
+title: 'User Account Creation'
+description: 'Create user accounts on behalf of users with the v3 SDK'
+---
+
+## Suggested Prerequisites
+
+- Business wallet credentials
+- Email verification system
+- User consent management
+- Secure key storage system
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate user account creation from the v3 SDK: https://docs.handcash.io/v3/connect/user-creation
+```
+
+## Create User Account
+
+### Basic Account Creation
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'your-app-id',
+  appSecret: 'your-app-secret'
+});
+
+// Create user account with email verification
+const account = await Connect.createUserAccount({
+  client: sdk.client,
+  email: 'user@example.com',
+  handle: 'username',
+  displayName: 'User Display Name'
+});
+
+console.log('Account created:', account.userId);
+```
+
+### Account Creation with Custom Verification
+
+```typescript
+// Create account with custom verification email
+const account = await Connect.createUserAccount({
+  client: sdk.client,
+  email: 'user@example.com',
+  handle: 'username',
+  displayName: 'User Display Name',
+  customVerificationEmail: {
+    subject: 'Welcome to Our App!',
+    body: 'Please verify your account by clicking the link below...'
+  }
+});
+```
+
+## Verify Email Address
+
+### Send Verification Code
+
+```typescript
+// Send verification code to user's email
+const verification = await Connect.sendVerificationCode({
+  client: sdk.client,
+  email: 'user@example.com'
+});
+
+console.log('Verification code sent to:', verification.email);
+console.log('Request ID:', verification.requestId);
+```
+
+### Verify Code
+
+```typescript
+// Verify the code provided by user
+const verified = await Connect.verifyEmailCode({
+  client: sdk.client,
+  email: 'user@example.com',
+  verificationCode: '123456',
+  requestId: 'request-id-from-send-verification'
+});
+
+if (verified.success) {
+  console.log('Email verified successfully');
+}
+```
+
+## Handle Management
+
+### Check Handle Availability
+
+```typescript
+// Check if handle is available
+const availability = await Connect.checkHandleAvailability({
+  client: sdk.client,
+  handle: 'desired-handle'
+});
+
+if (!availability.available) {
+  console.log('Handle is not available, try another one');
+}
+```
+
+## Complete User Creation Flow
+
+```typescript
+async function createCompleteUser(email: string, handle: string, displayName: string) {
+  try {
+    // 1. Check handle availability
+    const handleCheck = await Connect.checkHandleAvailability({
+      client: sdk.client,
+      handle: handle
+    });
+
+    if (!handleCheck.available) {
+      throw new Error('Handle not available');
+    }
+
+    // 2. Create user account
+    const account = await Connect.createUserAccount({
+      client: sdk.client,
+      email: email,
+      handle: handle,
+      displayName: displayName
+    });
+
+    console.log('Wallet created successfully');
+    console.log('User ID:', account.userId);
+    console.log('Handle:', account.handle);
+
+    // 3. Send verification email
+    const verification = await Connect.sendVerificationCode({
+      client: sdk.client,
+      email: email
+    });
+
+    return {
+      account,
+      verification
+    };
+  } catch (error) {
+    console.error('Error creating user:', error);
+    throw error;
+  }
+}
+```
+
+## Error Handling
+
+```typescript
+try {
+  const account = await Connect.createUserAccount({
+    client: sdk.client,
+    email: 'user@example.com',
+    handle: 'username',
+    displayName: 'User Name'
+  });
+} catch (error) {
+  if (error.message.includes('Handle already exists')) {
+    console.log('Handle is already taken');
+  } else if (error.message.includes('Invalid email')) {
+    console.log('Email format is invalid');
+  } else if (error.message.includes('Insufficient permissions')) {
+    console.log('App needs user creation permissions');
+  } else {
+    console.log('Unexpected error:', error.message);
+  }
+}
+```

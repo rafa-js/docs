@@ -1,0 +1,15 @@
+---
+title: Read Inventory
+description: 'Read user inventory with HandCash Items'
+---
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({ appId, appSecret });
+const client = sdk.getAccountClient('<AUTH_TOKEN>');
+const { data: items } = await Connect.getItemsInventory({ client, body: { searchString: '', limit: 50 } });
+console.log(items);
+```
+
+

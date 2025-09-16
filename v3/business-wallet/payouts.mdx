@@ -1,0 +1,83 @@
+---
+title: 'Business Payouts'
+description: 'Manage business payouts and automated payment systems'
+---
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate business payouts from the v3 SDK: https://docs.handcash.io/v3/business-wallet/payouts
+```
+
+## Send Business Payouts
+
+### Basic Payout
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'your-app-id',
+  appSecret: 'your-app-secret'
+});
+
+// Send payout from business wallet
+const payout = await Connect.pay({
+  client: sdk.client,
+  payments: [
+    {
+      destination: 'recipient@handcash.io',
+      amount: 0.001,
+      currency: 'BSV'
+    }
+  ],
+  description: 'Business payout'
+});
+```
+
+### Bulk Payouts
+
+```typescript
+// Send multiple payouts
+const bulkPayout = await Connect.pay({
+  client: sdk.client,
+  payments: [
+    {
+      destination: 'user1@handcash.io',
+      amount: 0.001,
+      currency: 'BSV'
+    },
+    {
+      destination: 'user2@handcash.io',
+      amount: 0.002,
+      currency: 'BSV'
+    }
+  ],
+  description: 'Bulk business payouts'
+});
+```
+
+## Business Wallet Management
+
+### Check Balance
+
+```typescript
+// Get business wallet balance
+const balance = await Connect.getSpendableBalances({
+  client: sdk.client
+});
+
+console.log('Business wallet balance:', balance);
+```
+
+### Exchange Rates
+
+```typescript
+// Get current exchange rates
+const rates = await Connect.getExchangeRate({
+  client: sdk.client,
+  currencyCode: 'USD'
+});
+
+console.log('USD to BSV rate:', rates.rate);
+```

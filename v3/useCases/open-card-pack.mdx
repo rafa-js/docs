@@ -1,0 +1,141 @@
+---
+title: Openable Card Pack
+description: 'Creating and opening a card pack using Handcash Items'
+---
+
+This example demonstrates how to create an unopened card pack with an "Open" action, and then process the opening of the pack when a user activates the action.
+
+![Open Pack](/images/open-pack.png)
+
+## Step 1: Create Unopened Card Pack
+
+First, create an unopened card pack item with an "Open" action:
+
+```typescript
+import { getInstance, Items } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: process.env.HANDCASH_APP_ID,
+  appSecret: process.env.HANDCASH_APP_SECRET
+});
+
+const itemsClient = Items.fromAppCredentials({
+  appId: process.env.HANDCASH_APP_ID,
+  appSecret: process.env.HANDCASH_APP_SECRET
+});
+
+async function createCardPack() {
+  const collectionId = "your-collection-id";
+
+  const creationOrder = await itemsClient.createItemsOrder({
+    collectionId,
+    items: [
+      {
+        name: "Mystery Card Pack",
+        description: "Contains 5 random cards",
+        rarity: "Rare",
+        mediaDetails: {
+          image: {
+            url: "https://yourgame.com/images/unopened-pack.webp",
+            contentType: "image/webp"
+          }
+        },
+        actions: [
+          {
+            name: "Open Pack",
+            description: "Open this pack to receive 5 random cards",
+            url: "https://yourgame.com/api/open-pack"
+          }
+        ],
+        quantity: 1,
+      }
+    ]
+  });
+
+  console.log("Card pack created:", creationOrder);
+  return creationOrder;
+}
+
+createCardPack().catch(console.error);
+```
+
+## Step 2: Handle Pack Opening
+
+When a user activates the "Open Pack" action, they will be redirected to your game's API endpoint with their auth token and the item's origin. Your server should then process the pack opening using the provided auth token:
+
+```typescript
+import express from 'express';
+import { getInstance, Items } from '@handcash/sdk';
+
+const app = express();
+
+app.get('/api/open-pack', async (req, res) => {
+  const { authToken, itemOrigin } = req.query;
+
+  try {
+    // Create SDK instance with user auth token
+    const sdk = getInstance({
+      appId: process.env.HANDCASH_APP_ID,
+      appSecret: process.env.HANDCASH_APP_SECRET
+    });
+
+    const accountClient = sdk.getAccountClient(authToken as string);
+    const itemsClient = Items.fromAppCredentials({
+      appId: process.env.HANDCASH_APP_ID,
+      appSecret: process.env.HANDCASH_APP_SECRET
+    });
+
+    // Generate 5 random cards (this is where your game logic would go)
+    const newCards = generateRandomCards(5);
+
+    // Burn the pack and create new cards
+    const burnAndCreateResult = await itemsClient.burnAndCreateItemsOrder({
+      burn: {
+        origins: [itemOrigin as string],
+      },
+      issue: {
+        items: newCards,
+        collectionId: "your-collection-id",
+      }
+    });
+
+    console.log("Pack opened, new cards created:", burnAndCreateResult);
+
+    // Redirect the user to their inventory or a "pack opened" page
+    res.redirect('/pack-opened?result=success');
+  } catch (error) {
+    console.error("Error opening pack:", error);
+    res.status(500).send("Error opening pack");
+  }
+});
+
+function generateRandomCards(count: number) {
+  // This is a placeholder for your game's logic to generate random cards
+  return Array(count).fill(null).map((_, index) => ({
+    name: `Random Card ${index + 1}`,
+    description: "A card from the Mystery Pack",
+    rarity: ["Common", "Uncommon", "Rare", "Epic", "Legendary"][Math.floor(Math.random() * 5)],
+    mediaDetails: {
+      image: {
+        url: `https://yourgame.com/images/card-${index + 1}.webp`,
+        contentType: "image/webp"
+      }
+    },
+    quantity: 1,
+  }));
+}
+
+app.listen(3000, () => console.log('Server running on port 3000'));
+```
+
+## Process Overview
+
+1. **Create Card Pack**: Your game creates an unopened card pack item with an "Open Pack" action.
+2. **User Interaction**: The user purchases the pack from the Handcash market and selects the "Open Pack" action.
+3. **Redirect**: Handcash redirects the user to your game's API with the user's auth token and the pack's item origin.
+4. **Authentication**: Your server creates a new SDK instance using the auth token provided in the query parameters.
+5. **Generate Cards**: Your game logic generates random cards to represent the pack's contents.
+6. **Burn and Create**: In a single API call, your server burns the unopened pack and creates the new card items using the authenticated SDK instance.
+7. **User Feedback**: The user is redirected to a page showing their newly opened cards.
+
+This example demonstrates how to create interactive items that can transform into other items, providing an engaging experience for users while leveraging the Handcash Items API for secure and efficient item management. The key change is using the auth token from the query parameters to authenticate the action, ensuring that the operation is performed on behalf of the correct user.

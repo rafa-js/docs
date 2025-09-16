@@ -1,0 +1,161 @@
+---
+title: Manage Payment Request
+description: 'Check status, update, and cancel payment requests'
+---
+
+## Check Payment Request Status
+
+```typescript
+import { getInstance } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'your-app-id',
+  appSecret: 'your-app-secret'
+});
+
+// Get payment request details
+const paymentRequest = await sdk.getPaymentRequest({
+  paymentRequestId: 'pr_123456789'
+});
+
+console.log('Status:', paymentRequest.status);
+console.log('Amount:', paymentRequest.amount);
+console.log('Paid at:', paymentRequest.paidAt);
+```
+
+## List Payment Requests
+
+```typescript
+// Get all payment requests
+const paymentRequests = await sdk.getPaymentRequests({
+  limit: 50,
+  offset: 0,
+  status: 'pending' // optional filter
+});
+
+console.log(`Found ${paymentRequests.length} payment requests`);
+
+paymentRequests.forEach(pr => {
+  console.log(`${pr.id}: ${pr.amount} ${pr.currency} - ${pr.status}`);
+});
+```
+
+## Update Payment Request
+
+```typescript
+// Update payment request details
+const updatedRequest = await sdk.updatePaymentRequest({
+  paymentRequestId: 'pr_123456789',
+  description: 'Updated payment description',
+  amount: 30.00, // Update amount if not paid
+  redirectUrl: 'https://yoursite.com/new-success-url'
+});
+
+console.log('Updated payment request:', updatedRequest);
+```
+
+## Cancel Payment Request
+
+```typescript
+// Cancel a pending payment request
+const cancelledRequest = await sdk.cancelPaymentRequest({
+  paymentRequestId: 'pr_123456789'
+});
+
+console.log('Cancelled payment request:', cancelledRequest);
+```
+
+## Payment Request Statuses
+
+```typescript
+// Check different statuses
+const statuses = {
+  PENDING: 'Waiting for payment',
+  PAID: 'Payment completed successfully',
+  CANCELLED: 'Payment request was cancelled',
+  EXPIRED: 'Payment request expired',
+  FAILED: 'Payment failed'
+};
+
+const paymentRequest = await sdk.getPaymentRequest({
+  paymentRequestId: 'pr_123456789'
+});
+
+switch (paymentRequest.status) {
+  case 'PENDING':
+    console.log('Payment is still pending');
+    break;
+  case 'PAID':
+    console.log('Payment completed!');
+    console.log('Transaction ID:', paymentRequest.transactionId);
+    console.log('Paid at:', paymentRequest.paidAt);
+    break;
+  case 'CANCELLED':
+    console.log('Payment was cancelled');
+    break;
+  case 'EXPIRED':
+    console.log('Payment request expired');
+    break;
+  case 'FAILED':
+    console.log('Payment failed:', paymentRequest.failureReason);
+    break;
+}
+```
+
+## Search Payment Requests
+
+```typescript
+// Search payment requests by various criteria
+const searchResults = await sdk.searchPaymentRequests({
+  query: {
+    amount: { min: 10, max: 100 },
+    currency: 'USD',
+    status: 'paid',
+    createdAt: {
+      from: '2024-01-01T00:00:00Z',
+      to: '2024-01-31T23:59:59Z'
+    }
+  },
+  limit: 25,
+  offset: 0
+});
+
+console.log(`Found ${searchResults.length} matching payment requests`);
+```
+
+## Payment Request Analytics
+
+```typescript
+// Get payment request statistics
+const stats = await sdk.getPaymentRequestStats({
+  from: '2024-01-01T00:00:00Z',
+  to: '2024-01-31T23:59:59Z'
+});
+
+console.log('Total requests:', stats.total);
+console.log('Paid requests:', stats.paid);
+console.log('Pending requests:', stats.pending);
+console.log('Cancelled requests:', stats.cancelled);
+console.log('Total amount:', stats.totalAmount);
+console.log('Success rate:', (stats.paid / stats.total * 100).toFixed(2) + '%');
+```
+
+## Error Handling
+
+```typescript
+try {
+  const paymentRequest = await sdk.getPaymentRequest({
+    paymentRequestId: 'pr_123456789'
+  });
+} catch (error) {
+  if (error.code === 'PAYMENT_REQUEST_NOT_FOUND') {
+    console.log('Payment request does not exist');
+  } else if (error.code === 'PAYMENT_REQUEST_EXPIRED') {
+    console.log('Payment request has expired');
+  } else if (error.code === 'INSUFFICIENT_PERMISSIONS') {
+    console.log('You do not have permission to access this payment request');
+  } else {
+    console.log('Error retrieving payment request:', error.message);
+  }
+}
+```

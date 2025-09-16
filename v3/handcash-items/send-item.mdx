@@ -1,0 +1,18 @@
+---
+title: Send an Item
+description: 'Transfer items between users with HandCash Items'
+---
+
+
+```typescript
+import { HandCashConnect } from '@handcash/handcash-connect';
+
+const connect = new HandCashConnect({ appId, appSecret });
+const account = connect.getAccountFromAuthToken('<AUTH_TOKEN>');
+await account.items.transferItems({
+  items: [{ id: '<ITEM_ID>' }],
+  to: '<DESTINATION_HANDLE_OR_ID>',
+});
+```
+
+

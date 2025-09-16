@@ -1,0 +1,16 @@
+---
+title: Burn an Item
+description: 'Permanently destroy items with HandCash Items'
+---
+
+```typescript
+import { HandCashConnect } from '@handcash/handcash-connect';
+
+const connect = new HandCashConnect({ appId, appSecret });
+const account = connect.getAccountFromAuthToken('<AUTH_TOKEN>');
+await account.items.burnItems({
+  items: [{ id: '<ITEM_ID>' }],
+});
+```
+
+
