@@ -1,47 +1,246 @@
 ---
-title: Payment Webhooks
-description: 'Receive real-time notifications for completed payment requests'
+title: Webhooks
+description: 'Handle real-time payment notifications with webhooks'
 ---
 
-When you create a payment request with the `notifications.webhook` parameter set, you'll receive a notification each time a payment is completed. HandCash will send an HTTP POST request to the URL you specified.
+## Setup Webhooks
 
-## Webhook Payload
+Configure webhooks to receive real-time notifications when payment requests are paid, cancelled, or expire.
 
-Your endpoint will receive a POST request with the following JSON payload:
+```typescript
+import { getInstance } from '@handcash/sdk';
 
-```json
-{
-  "appSecret": "your-app-secret",
-  "paymentRequestId": "9ac9182acae19902",
-  "transactionId": "cc066a86e48f9f5715ba12f37c2cee0f525daf310eada76217b41771d6e67e66",
-  "customParameters": {
-    // The specified customParameters in the PaymentRequest notifications (if any)
-  },
-  "userData": {
-    "id": "64652c00e79d663eb1760a3c",
-    // Other requested user data (if any)
+const sdk = getInstance({
+  appId: 'your-app-id',
+  appSecret: 'your-app-secret'
+});
+
+// Register webhook endpoint
+const webhook = await sdk.createWebhook({
+  url: 'https://yoursite.com/webhooks/payments',
+  events: ['payment.paid', 'payment.cancelled', 'payment.expired'],
+  secret: 'your-webhook-secret'
+});
+
+console.log('Webhook created:', webhook.id);
+```
+
+## Webhook Endpoint
+
+Create a webhook endpoint to receive payment notifications:
+
+```typescript
+import express from 'express';
+import crypto from 'crypto';
+
+const app = express();
+
+// Middleware to verify webhook signature
+const verifyWebhookSignature = (req, res, next) => {
+  const signature = req.headers['x-handcash-signature'];
+  const payload = JSON.stringify(req.body);
+  const secret = process.env.WEBHOOK_SECRET;
+  
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  
+  if (signature !== expectedSignature) {
+    return res.status(401).send('Invalid signature');
   }
+  
+  next();
+};
+
+app.use(express.json());
+app.use(verifyWebhookSignature);
+
+app.post('/webhooks/payments', (req, res) => {
+  const { event, data } = req.body;
+  
+  switch (event) {
+    case 'payment.paid':
+      handlePaymentPaid(data);
+      break;
+    case 'payment.cancelled':
+      handlePaymentCancelled(data);
+      break;
+    case 'payment.expired':
+      handlePaymentExpired(data);
+      break;
+    default:
+      console.log('Unknown event:', event);
+  }
+  
+  res.status(200).send('OK');
+});
+```
+
+## Handle Payment Events
+
+```typescript
+// Handle successful payment
+async function handlePaymentPaid(paymentData) {
+  console.log('Payment completed:', paymentData.paymentRequestId);
+  console.log('Amount:', paymentData.amount);
+  console.log('Currency:', paymentData.currency);
+  console.log('Transaction ID:', paymentData.transactionId);
+  console.log('Paid at:', paymentData.paidAt);
+  
+  // Update your database
+  await updateOrderStatus(paymentData.paymentRequestId, 'paid');
+  
+  // Send confirmation email
+  await sendPaymentConfirmation(paymentData);
+  
+  // Fulfill order
+  await fulfillOrder(paymentData.paymentRequestId);
+}
+
+// Handle cancelled payment
+async function handlePaymentCancelled(paymentData) {
+  console.log('Payment cancelled:', paymentData.paymentRequestId);
+  
+  // Update order status
+  await updateOrderStatus(paymentData.paymentRequestId, 'cancelled');
+  
+  // Restore inventory
+  await restoreInventory(paymentData.paymentRequestId);
+}
+
+// Handle expired payment
+async function handlePaymentExpired(paymentData) {
+  console.log('Payment expired:', paymentData.paymentRequestId);
+  
+  // Update order status
+  await updateOrderStatus(paymentData.paymentRequestId, 'expired');
+  
+  // Clean up expired order
+  await cleanupExpiredOrder(paymentData.paymentRequestId);
 }
 ```
 
-## Handling Webhooks
+## Webhook Payload Structure
 
-1. Your server must return a `200` status code once you have successfully processed the notification.
-2. If HandCash doesn't receive a `200` response, it will retry with exponential backoff for 24 hours.
+```typescript
+// Payment Paid Event
+{
+  "event": "payment.paid",
+  "data": {
+    "paymentRequestId": "pr_123456789",
+    "amount": 25.00,
+    "currency": "USD",
+    "transactionId": "tx_abcdef123456",
+    "paidAt": "2024-01-15T10:45:00Z",
+    "payer": {
+      "handle": "user123",
+      "displayName": "John Doe"
+    },
+    "metadata": {
+      "orderId": "ORDER-12345",
+      "customerId": "CUST-67890"
+    }
+  },
+  "timestamp": "2024-01-15T10:45:00Z"
+}
 
-## Security
+// Payment Cancelled Event
+{
+  "event": "payment.cancelled",
+  "data": {
+    "paymentRequestId": "pr_123456789",
+    "cancelledAt": "2024-01-15T10:30:00Z",
+    "reason": "user_cancelled"
+  },
+  "timestamp": "2024-01-15T10:30:00Z"
+}
 
-To ensure the webhook is genuinely from HandCash:
+// Payment Expired Event
+{
+  "event": "payment.expired",
+  "data": {
+    "paymentRequestId": "pr_123456789",
+    "expiredAt": "2024-01-15T11:00:00Z"
+  },
+  "timestamp": "2024-01-15T11:00:00Z"
+}
+```
 
-1. Verify that the `appSecret` in the webhook payload matches your app's secret.
-2. This confirmation ensures the HTTP call is invoked directly from HandCash to your service.
+## Webhook Security
 
-🔐 **Keep it secure**: Anyone could potentially send an HTTP request to your server and fake a payment confirmation. Always verify the `appSecret`.
+```typescript
+// Verify webhook signature
+function verifyWebhookSignature(payload, signature, secret) {
+  const expectedSignature = crypto
+    .createHmac('sha256', secret)
+    .update(payload)
+    .digest('hex');
+  
+  return crypto.timingSafeEqual(
+    Buffer.from(signature, 'hex'),
+    Buffer.from(expectedSignature, 'hex')
+  );
+}
 
-## Best Practices
+// Rate limiting
+const rateLimit = require('express-rate-limit');
 
-1. Implement proper error handling in your webhook endpoint.
-2. Use HTTPS for your webhook URL to ensure secure communication.
-3. Consider implementing a queue system if you expect high volumes of webhooks.
-4. Log all received webhooks for debugging and auditing purposes.
-5. Implement idempotency to handle potential duplicate webhooks.
+const webhookLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many webhook requests'
+});
+
+app.use('/webhooks', webhookLimiter);
+```
+
+## Webhook Management
+
+```typescript
+// List webhooks
+const webhooks = await sdk.getWebhooks();
+console.log('Active webhooks:', webhooks);
+
+// Update webhook
+const updatedWebhook = await sdk.updateWebhook({
+  webhookId: 'webhook_123',
+  url: 'https://yoursite.com/new-webhook-endpoint',
+  events: ['payment.paid', 'payment.cancelled']
+});
+
+// Delete webhook
+await sdk.deleteWebhook({
+  webhookId: 'webhook_123'
+});
+```
+
+## Testing Webhooks
+
+```typescript
+// Test webhook endpoint locally
+const testWebhook = async () => {
+  const testPayload = {
+    event: 'payment.paid',
+    data: {
+      paymentRequestId: 'test_pr_123',
+      amount: 10.00,
+      currency: 'USD',
+      transactionId: 'test_tx_456',
+      paidAt: new Date().toISOString()
+    },
+    timestamp: new Date().toISOString()
+  };
+  
+  const response = await fetch('http://localhost:3000/webhooks/payments', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Handcash-Signature': generateTestSignature(testPayload)
+    },
+    body: JSON.stringify(testPayload)
+  });
+  
+  console.log('Test webhook response:', response.status);
+};
+```

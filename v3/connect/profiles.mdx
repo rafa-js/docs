@@ -1,0 +1,179 @@
+---
+title: User Profiles
+description: 'Manage user profiles and social features with Handcash Connect'
+---
+
+## Suggested Prerequisites
+- User authentication completed
+- Profile permissions granted
+- Social features enabled
+- Database for storing profile data
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate user profiles from the v3 SDK: https://docs.handcash.io/v3/connect/profiles
+```
+
+## Get Current User Profile
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({ appId, appSecret });
+const client = sdk.getAccountClient(authToken);
+
+const { data: profile } = await Connect.getCurrentUserProfile({ client });
+console.log('User profile:', profile);
+```
+
+### Profile Data Structure
+
+```typescript
+interface UserProfile {
+  publicProfile: {
+    id: string;
+    handle: string;
+    paymail: string;
+    displayName: string;
+    avatarUrl: string;
+    createdAt: string;
+  };
+  privateProfile: {
+    email: string;
+  };
+}
+```
+
+## Get Public Profiles by Handle
+
+```typescript
+const { data: profiles } = await Connect.getPublicUserProfiles({
+  client: sdk.client, // Static client for public data
+  body: {
+    handles: ['user1', 'user2', 'user3']
+  }
+});
+
+profiles.forEach(profile => {
+  console.log(`${profile.handle}: ${profile.displayName}`);
+});
+```
+
+## Get User's Friends
+
+```typescript
+const { data: friends } = await Connect.getPublicUserProfiles({
+  client,
+  body: {
+    handles: [] // Empty array gets user's friends
+  }
+});
+
+console.log(`User has ${friends.length} friends`);
+```
+
+## Check User Permissions
+
+```typescript
+const { data: permissions } = await Connect.getPermissions({ client });
+console.log('Granted permissions:', permissions);
+
+// Check specific permission
+const hasPayPermission = permissions.includes('PAY');
+const hasProfilePermission = permissions.includes('USER_PUBLIC_PROFILE');
+```
+
+## Common Use Cases
+
+### User Dashboard
+
+```typescript
+async function getUserDashboard(authToken: string) {
+  const client = sdk.getAccountClient(authToken);
+  
+  const [profile, balances, permissions] = await Promise.all([
+    Connect.getCurrentUserProfile({ client }),
+    Connect.getSpendableBalances({ client }),
+    Connect.getPermissions({ client })
+  ]);
+  
+  return {
+    user: profile.data,
+    balance: balances.data,
+    permissions: permissions.data
+  };
+}
+```
+
+### Friend Lookup
+
+```typescript
+async function findFriends(handles: string[]) {
+  const { data: profiles } = await Connect.getPublicUserProfiles({
+    client: sdk.client,
+    body: { handles }
+  });
+  
+  return profiles.map(profile => ({
+    handle: profile.handle,
+    displayName: profile.displayName,
+    avatar: profile.avatarUrl
+  }));
+}
+```
+
+### Permission Check
+
+```typescript
+function checkPermission(permissions: string[], required: string): boolean {
+  return permissions.includes(required);
+}
+
+// Usage
+const canPay = checkPermission(permissions, 'PAY');
+const canReadProfile = checkPermission(permissions, 'USER_PUBLIC_PROFILE');
+```
+
+## Error Handling
+
+```typescript
+try {
+  const { data: profile } = await Connect.getCurrentUserProfile({ client });
+} catch (error) {
+  if (error.message.includes('Invalid token')) {
+    // Redirect to re-authenticate
+    res.redirect(sdk.getRedirectionUrl());
+  } else if (error.message.includes('Permission denied')) {
+    // Handle insufficient permissions
+    console.log('User needs to grant profile permission');
+  }
+}
+```
+
+## Profile Display Examples
+
+### Simple Profile Card
+
+```typescript
+function ProfileCard({ profile }: { profile: UserProfile }) {
+  return {
+    handle: profile.publicProfile.handle,
+    displayName: profile.publicProfile.displayName,
+    avatar: profile.publicProfile.avatarUrl,
+    email: profile.privateProfile.email
+  };
+}
+```
+
+### Friends List
+
+```typescript
+function FriendsList({ friends }: { friends: UserProfile[] }) {
+  return friends.map(friend => ({
+    handle: friend.publicProfile.handle,
+    displayName: friend.publicProfile.displayName,
+    avatar: friend.publicProfile.avatarUrl
+  }));
+}
+```

@@ -1,0 +1,62 @@
+---
+title: Getting Started
+description: 'Complete guide to using the Handcash SDK v3'
+---
+
+# Handcash SDK v3
+
+The Handcash SDK v3 (`@handcash/sdk`) is a fully-featured Node.js library that provides seamless integration with Handcash services. It includes Connect, Items, Wallet API, and Business Wallet functionality.
+
+## Quick Start
+
+### Installation
+
+```bash
+npm install @handcash/sdk
+```
+
+### Basic Setup
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'YOUR_APP_ID',
+  appSecret: 'YOUR_APP_SECRET',
+});
+
+// Get user client after authentication
+const client = sdk.getAccountClient('<AUTH_TOKEN>');
+```
+
+## Available Features
+
+### 🔗 **Connect** - User Authentication & Payments
+- User authentication and profile management
+- Send and receive payments
+- Check balances and exchange rates
+- Manage user permissions
+
+### 🎮 **Items** - Digital Items & NFTs
+- Create and manage digital items
+- Transfer items between users
+- Burn and craft items
+- Inventory management
+
+### 💼 **Business Wallet** - Business Operations
+- Manage business payouts
+- Create and manage business wallets
+- Automated payment systems
+
+### 🏪 **Wallet API** - User Wallet Creation
+- Create wallets for users with email verification
+- Manage user accounts programmatically
+- Custom verification flows
+
+## Next Steps
+
+Choose a feature from the navigation menu to get started with specific functionality. Each section includes:
+- **Suggested Prompt** to help you find what you need
+- **Simple examples** for common use cases
+- **Complete API reference** for advanced usage
+

@@ -1,18 +1,14 @@
 ---
 title: Read Inventory
-description: 'Read user inventory (pending v3 endpoints)'
+description: 'Read user inventory with HandCash Items'
 ---
 
-<Note>
-Pending v3: example uses legacy package.
-</Note>
-
 ```typescript
-import { HandCashConnect } from '@handcash/handcash-connect';
+import { getInstance, Connect } from '@handcash/sdk';
 
-const connect = new HandCashConnect({ appId, appSecret });
-const account = connect.getAccountFromAuthToken('<AUTH_TOKEN>');
-const items = await account.items.getItemsInventory({ searchString: '', limit: 50 });
+const sdk = getInstance({ appId, appSecret });
+const client = sdk.getAccountClient('<AUTH_TOKEN>');
+const { data: items } = await Connect.getItemsInventory({ client, body: { searchString: '', limit: 50 } });
 console.log(items);
 ```
 

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@handcash/sdk": "^1.0.2"
+  }
+}

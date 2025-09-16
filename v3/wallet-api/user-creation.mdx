@@ -1,0 +1,309 @@
+---
+title: User Wallet Creation
+description: 'Create wallets for users with email verification'
+---
+
+## Suggested Prerequisites
+- Business wallet credentials
+- Email verification system
+- User consent management
+- Secure key storage system
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate user wallet creation from our Wallet API: https://docs.handcash.io/v3/wallet-api/user-creation
+```
+
+## Prerequisites
+
+- Business wallet credentials
+- Email verification system
+- User consent for wallet creation
+
+## Create User Wallet
+
+### Step 1: Request Email Verification
+
+```typescript
+import { WalletService, Crypto } from '@handcash/sdk';
+
+const walletService = new WalletService({
+  appId: 'YOUR_APP_ID',
+  appSecret: 'YOUR_APP_SECRET',
+});
+
+// Request email verification code
+const email = 'user@example.com';
+const requestId = await walletService.requestSignUpEmailCode(email);
+
+console.log('Verification code sent to:', email);
+console.log('Request ID:', requestId);
+```
+
+### Step 2: Verify Email Code
+
+```typescript
+// User enters verification code
+const verificationCode = '12345678'; // From user input
+const keyPair = Crypto.generateAuthenticationKeyPair();
+
+await walletService.verifyEmailCode(requestId, verificationCode, keyPair.publicKey);
+console.log('Email verified successfully');
+```
+
+### Step 3: Check Handle Availability
+
+```typescript
+const desiredHandle = 'user-chosen-handle';
+const isAvailable = await walletService.isAliasAvailable(desiredHandle);
+
+if (!isAvailable) {
+  console.log('Handle is not available, try another one');
+  // Prompt user for different handle
+}
+```
+
+### Step 4: Create Wallet
+
+```typescript
+// Create the wallet
+await walletService.createWalletAccount(
+  keyPair.publicKey,
+  email,
+  desiredHandle
+);
+
+console.log('Wallet created successfully');
+
+// Store the private key securely
+await storeAuthenticationKey(keyPair.privateKey);
+```
+
+### Step 5: Access the New Wallet
+
+```typescript
+// Get access to the new wallet
+const account = walletService.getWalletAccountFromAuthToken(keyPair.privateKey);
+
+// Now you can use the wallet
+const profile = await account.profile.getCurrentProfile();
+console.log('New user profile:', profile);
+```
+
+## Complete Wallet Creation Flow
+
+```typescript
+async function createUserWallet(email: string, handle: string) {
+  try {
+    const walletService = new WalletService({
+      appId: process.env.HANDCASH_APP_ID,
+      appSecret: process.env.HANDCASH_APP_SECRET,
+    });
+
+    // Step 1: Request email verification
+    const requestId = await walletService.requestSignUpEmailCode(email);
+    
+    // Step 2: Wait for user to enter verification code
+    // (This would be handled in your UI)
+    const verificationCode = await getUserVerificationCode();
+    
+    // Step 3: Generate key pair
+    const keyPair = Crypto.generateAuthenticationKeyPair();
+    
+    // Step 4: Verify email
+    await walletService.verifyEmailCode(requestId, verificationCode, keyPair.publicKey);
+    
+    // Step 5: Check handle availability
+    const isAvailable = await walletService.isAliasAvailable(handle);
+    if (!isAvailable) {
+      throw new Error('Handle is not available');
+    }
+    
+    // Step 6: Create wallet
+    await walletService.createWalletAccount(keyPair.publicKey, email, handle);
+    
+    // Step 7: Store credentials securely
+    await storeUserCredentials({
+      email,
+      handle,
+      privateKey: keyPair.privateKey,
+      publicKey: keyPair.publicKey
+    });
+    
+    return {
+      success: true,
+      handle,
+      email,
+      message: 'Wallet created successfully'
+    };
+    
+  } catch (error) {
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+```
+
+## Handle Existing Users
+
+### Check if User Exists
+
+```typescript
+async function activateExistingUser(email: string) {
+  const walletService = new WalletService({
+    appId: process.env.HANDCASH_APP_ID,
+    appSecret: process.env.HANDCASH_APP_SECRET,
+  });
+
+  try {
+    // Request sign-in email code
+    const requestId = await walletService.requestSignInEmailCode(email);
+    
+    // User enters verification code
+    const verificationCode = await getUserVerificationCode();
+    const keyPair = Crypto.generateAuthenticationKeyPair();
+    
+    // Verify email
+    await walletService.verifyEmailCode(requestId, verificationCode, keyPair.publicKey);
+    
+    // Activate access for existing user
+    await walletService.activateAccessKey(keyPair.publicKey, email);
+    
+    // Store credentials
+    await storeUserCredentials({
+      email,
+      privateKey: keyPair.privateKey,
+      publicKey: keyPair.publicKey
+    });
+    
+    return { success: true, message: 'User access activated' };
+    
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+```
+
+## Error Handling
+
+```typescript
+async function safeWalletCreation(email: string, handle: string) {
+  try {
+    const result = await createUserWallet(email, handle);
+    return result;
+  } catch (error) {
+    if (error.message.includes('Email already exists')) {
+      return { success: false, error: 'User already has a wallet' };
+    } else if (error.message.includes('Invalid email')) {
+      return { success: false, error: 'Invalid email address' };
+    } else if (error.message.includes('Handle not available')) {
+      return { success: false, error: 'Handle is already taken' };
+    } else if (error.message.includes('Verification failed')) {
+      return { success: false, error: 'Invalid verification code' };
+    } else {
+      return { success: false, error: 'Wallet creation failed' };
+    }
+  }
+}
+```
+
+## Security Best Practices
+
+### Secure Key Storage
+
+```typescript
+async function storeUserCredentials(credentials: {
+  email: string;
+  handle: string;
+  privateKey: string;
+  publicKey: string;
+}) {
+  // Encrypt the private key before storing
+  const encryptedPrivateKey = await encrypt(credentials.privateKey);
+  
+  // Store in secure database
+  await database.users.create({
+    email: credentials.email,
+    handle: credentials.handle,
+    encryptedPrivateKey,
+    publicKey: credentials.publicKey,
+    createdAt: new Date()
+  });
+}
+```
+
+### Key Retrieval
+
+```typescript
+async function getUserCredentials(email: string) {
+  const user = await database.users.findByEmail(email);
+  
+  if (!user) {
+    throw new Error('User not found');
+  }
+  
+  // Decrypt the private key
+  const privateKey = await decrypt(user.encryptedPrivateKey);
+  
+  return {
+    email: user.email,
+    handle: user.handle,
+    privateKey,
+    publicKey: user.publicKey
+  };
+}
+```
+
+## Common Use Cases
+
+### Onboarding Flow
+
+```typescript
+async function userOnboarding(email: string, handle: string) {
+  // Check if user already exists
+  const existingUser = await checkExistingUser(email);
+  
+  if (existingUser) {
+    return await activateExistingUser(email);
+  } else {
+    return await createUserWallet(email, handle);
+  }
+}
+```
+
+### Bulk User Creation
+
+```typescript
+async function createBulkUsers(users: Array<{email: string, handle: string}>) {
+  const results = [];
+  
+  for (const user of users) {
+    try {
+      const result = await createUserWallet(user.email, user.handle);
+      results.push({ ...user, ...result });
+    } catch (error) {
+      results.push({ 
+        ...user, 
+        success: false, 
+        error: error.message 
+      });
+    }
+  }
+  
+  return results;
+}
+```
+
+## Best Practices
+
+- **Validate email format** before requesting verification
+- **Check handle availability** before creation
+- **Store keys securely** with encryption
+- **Handle errors gracefully** with user-friendly messages
+- **Implement rate limiting** for email verification
+- **Log all operations** for audit purposes
+- **Use HTTPS** for all communications
+- **Implement retry logic** for failed operations

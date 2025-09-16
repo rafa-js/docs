@@ -1,6 +1,6 @@
 ---
 title: Openable Card Pack
-description: 'Creating and opening a card pack using HandCash Items'
+description: 'Creating and opening a card pack using Handcash Items'
 ---
 
 This example demonstrates how to create an unopened card pack with an "Open" action, and then process the opening of the pack when a user activates the action.
@@ -12,18 +12,22 @@ This example demonstrates how to create an unopened card pack with an "Open" act
 First, create an unopened card pack item with an "Open" action:
 
 ```typescript
-import { HandCashMinter } from '@handcash/handcash-connect';
+import { getInstance, Items } from '@handcash/sdk';
 
-const handCashMinter = HandCashMinter.fromAppCredentials({
+const sdk = getInstance({
   appId: process.env.HANDCASH_APP_ID,
-  authToken: process.env.HANDCASH_AUTH_TOKEN,
+  appSecret: process.env.HANDCASH_APP_SECRET
+});
+
+const itemsClient = Items.fromAppCredentials({
+  appId: process.env.HANDCASH_APP_ID,
   appSecret: process.env.HANDCASH_APP_SECRET
 });
 
 async function createCardPack() {
   const collectionId = "your-collection-id";
 
-  const creationOrder = await handCashMinter.createItemsOrder({
+  const creationOrder = await itemsClient.createItemsOrder({
     collectionId,
     items: [
       {
@@ -61,26 +65,31 @@ When a user activates the "Open Pack" action, they will be redirected to your ga
 
 ```typescript
 import express from 'express';
-import { HandCashMinter } from '@handcash/handcash-connect';
+import { getInstance, Items } from '@handcash/sdk';
 
 const app = express();
 
 app.get('/api/open-pack', async (req, res) => {
   const { authToken, itemOrigin } = req.query;
 
-  // Create a new HandCashMinter instance using the auth token from the query
-  const handCashMinter = HandCashMinter.fromAppCredentials({
-    appId: process.env.HANDCASH_APP_ID,
-    authToken: authToken as string, // Use the auth token from the query
-    appSecret: process.env.HANDCASH_APP_SECRET
-  });
-
   try {
+    // Create SDK instance with user auth token
+    const sdk = getInstance({
+      appId: process.env.HANDCASH_APP_ID,
+      appSecret: process.env.HANDCASH_APP_SECRET
+    });
+
+    const accountClient = sdk.getAccountClient(authToken as string);
+    const itemsClient = Items.fromAppCredentials({
+      appId: process.env.HANDCASH_APP_ID,
+      appSecret: process.env.HANDCASH_APP_SECRET
+    });
+
     // Generate 5 random cards (this is where your game logic would go)
     const newCards = generateRandomCards(5);
 
     // Burn the pack and create new cards
-    const burnAndCreateResult = await handCashMinter.burnAndCreateItemsOrder({
+    const burnAndCreateResult = await itemsClient.burnAndCreateItemsOrder({
       burn: {
         origins: [itemOrigin as string],
       },
@@ -122,11 +131,11 @@ app.listen(3000, () => console.log('Server running on port 3000'));
 ## Process Overview
 
 1. **Create Card Pack**: Your game creates an unopened card pack item with an "Open Pack" action.
-2. **User Interaction**: The user purchases the pack from the HandCash market and selects the "Open Pack" action.
-3. **Redirect**: HandCash redirects the user to your game's API with the user's auth token and the pack's item origin.
-4. **Authentication**: Your server creates a new HandCashMinter instance using the auth token provided in the query parameters.
+2. **User Interaction**: The user purchases the pack from the Handcash market and selects the "Open Pack" action.
+3. **Redirect**: Handcash redirects the user to your game's API with the user's auth token and the pack's item origin.
+4. **Authentication**: Your server creates a new SDK instance using the auth token provided in the query parameters.
 5. **Generate Cards**: Your game logic generates random cards to represent the pack's contents.
-6. **Burn and Create**: In a single API call, your server burns the unopened pack and creates the new card items using the authenticated HandCashMinter instance.
+6. **Burn and Create**: In a single API call, your server burns the unopened pack and creates the new card items using the authenticated SDK instance.
 7. **User Feedback**: The user is redirected to a page showing their newly opened cards.
 
-This example demonstrates how to create interactive items that can transform into other items, providing an engaging experience for users while leveraging the HandCash Items API for secure and efficient item management. The key change is using the auth token from the query parameters to authenticate the action, ensuring that the operation is performed on behalf of the correct user.
+This example demonstrates how to create interactive items that can transform into other items, providing an engaging experience for users while leveraging the Handcash Items API for secure and efficient item management. The key change is using the auth token from the query parameters to authenticate the action, ensuring that the operation is performed on behalf of the correct user.

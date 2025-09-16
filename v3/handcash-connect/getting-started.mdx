@@ -113,7 +113,7 @@ app.get('/handcash/success', (req, res) => {
   const client = sdk.getAccountClient(authToken);
 
   // Proceed with your application logic
-  res.redirect('/dashboard');
+  res.redirect('/');
 });
 ```
 
@@ -148,7 +148,7 @@ const redirectionLoginUrl = sdk.getRedirectionUrl({ state: 'xyz' });
 
 3. **HandCash Redirects Back to Your App:** After authorization, HandCash redirects the user back to your specified success or failure URL, including the authToken if successful.
 
-4. **Your App Uses the authToken:** Use the authToken to initialize the user's account client with the SDK v3.
+4. **Your App Uses the authToken:** Use the authToken to initialize the user's account client with the v3 SDK.
 
 5. **Interact with the User's Account:** Utilize the SDK to access user data and perform actions on their behalf.
 

@@ -1,0 +1,251 @@
+---
+title: Items Inventory
+description: 'Manage digital items and inventory with Handcash Items'
+---
+
+## Suggested Prerequisites
+- User authentication completed
+- Items permissions granted
+- Item management system
+- Database for inventory tracking
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate item inventory from the v3 SDK: https://docs.handcash.io/v3/items/inventory
+```
+
+## Get Items Inventory
+
+### Basic Inventory
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({ appId, appSecret });
+const client = sdk.getAccountClient(authToken);
+
+const { data: items } = await Connect.getItemsInventory({
+  client,
+  body: {}
+});
+
+console.log(`User has ${items.length} items`);
+```
+
+### Search Items
+
+```typescript
+const { data: items } = await Connect.getItemsInventory({
+  client,
+  body: {
+    searchString: 'dragon',
+    limit: 20
+  }
+});
+
+console.log(`Found ${items.length} items matching "dragon"`);
+```
+
+### Filter by Collection
+
+```typescript
+const { data: items } = await Connect.getItemsInventory({
+  client,
+  body: {
+    collectionId: 'collection-id-here',
+    limit: 50
+  }
+});
+
+console.log(`Found ${items.length} items in collection`);
+```
+
+### Advanced Filtering
+
+```typescript
+const { data: items } = await Connect.getItemsInventory({
+  client,
+  body: {
+    searchString: 'legendary',
+    collectionId: 'collection-id',
+    groupingValue: 'group-id',
+    from: 0,
+    to: 20,
+    sort: 'name',
+    order: 'asc'
+  }
+});
+```
+
+## Item Data Structure
+
+```typescript
+interface Item {
+  id: string;
+  origin: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  multimediaUrl?: string;
+  rarity: string;
+  color: string;
+  attributes: ItemAttribute[];
+  collection: {
+    id: string;
+    name: string;
+    description: string;
+  };
+  user: {
+    alias: string;
+    displayName: string;
+    profilePictureUrl: string;
+  };
+  app: {
+    id: string;
+    name: string;
+    iconUrl: string;
+  };
+}
+
+interface ItemAttribute {
+  name: string;
+  value: string | number;
+  displayType: 'string' | 'number' | 'date';
+}
+```
+
+## Common Use Cases
+
+### User's Item Collection
+
+```typescript
+async function getUserCollection(authToken: string) {
+  const client = sdk.getAccountClient(authToken);
+  
+  const { data: items } = await Connect.getItemsInventory({
+    client,
+    body: { limit: 100 }
+  });
+  
+  // Group by collection
+  const grouped = items.reduce((acc, item) => {
+    const collectionName = item.collection.name;
+    if (!acc[collectionName]) {
+      acc[collectionName] = [];
+    }
+    acc[collectionName].push(item);
+    return acc;
+  }, {});
+  
+  return grouped;
+}
+```
+
+### Search by Rarity
+
+```typescript
+async function getRareItems(authToken: string, rarity: string) {
+  const client = sdk.getAccountClient(authToken);
+  
+  const { data: items } = await Connect.getItemsInventory({
+    client,
+    body: {
+      searchString: rarity,
+      limit: 50
+    }
+  });
+  
+  return items.filter(item => 
+    item.rarity.toLowerCase() === rarity.toLowerCase()
+  );
+}
+```
+
+### Item Statistics
+
+```typescript
+async function getItemStats(authToken: string) {
+  const client = sdk.getAccountClient(authToken);
+  
+  const { data: items } = await Connect.getItemsInventory({
+    client,
+    body: { limit: 1000 }
+  });
+  
+  const stats = {
+    total: items.length,
+    byRarity: {},
+    byCollection: {},
+    byApp: {}
+  };
+  
+  items.forEach(item => {
+    // Count by rarity
+    stats.byRarity[item.rarity] = (stats.byRarity[item.rarity] || 0) + 1;
+    
+    // Count by collection
+    const collectionName = item.collection.name;
+    stats.byCollection[collectionName] = (stats.byCollection[collectionName] || 0) + 1;
+    
+    // Count by app
+    const appName = item.app.name;
+    stats.byApp[appName] = (stats.byApp[appName] || 0) + 1;
+  });
+  
+  return stats;
+}
+```
+
+## Error Handling
+
+```typescript
+try {
+  const { data: items } = await Connect.getItemsInventory({
+    client,
+    body: { searchString: 'dragon' }
+  });
+} catch (error) {
+  if (error.message.includes('Invalid token')) {
+    // Redirect to re-authenticate
+    res.redirect(sdk.getRedirectionUrl());
+  } else if (error.message.includes('Permission denied')) {
+    // Handle insufficient permissions
+    console.log('User needs to grant items permission');
+  }
+}
+```
+
+## Display Examples
+
+### Item Card Component
+
+```typescript
+function ItemCard({ item }: { item: Item }) {
+  return {
+    name: item.name,
+    rarity: item.rarity,
+    image: item.imageUrl,
+    collection: item.collection.name,
+    attributes: item.attributes.map(attr => ({
+      name: attr.name,
+      value: attr.value,
+      type: attr.displayType
+    }))
+  };
+}
+```
+
+### Inventory Grid
+
+```typescript
+function InventoryGrid({ items }: { items: Item[] }) {
+  return items.map(item => ({
+    id: item.id,
+    name: item.name,
+    image: item.imageUrl,
+    rarity: item.rarity,
+    color: item.color
+  }));
+}
+```

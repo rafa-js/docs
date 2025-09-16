@@ -1,11 +1,11 @@
 ---
 title: Setup
-description: 'Manage and trade digital items within your application using HandCash Items'
+description: 'Manage and trade digital items within your application using Handcash Items'
 ---
 
-# Introduction to HandCash Items
+# Introduction to Handcash Items
 
-HandCash Items leverages the 1Sat ordinal token protocol on BSV to create, manage, and trade digital items. It's designed to abstract blockchain complexities, allowing developers to focus on building their applications without needing in-depth blockchain knowledge.
+Handcash Items leverages the 1Sat ordinal token protocol on BSV to create, manage, and trade digital items. It's designed to abstract blockchain complexities, allowing developers to focus on building their applications without needing in-depth blockchain knowledge.
 
 <Note>
 The v3 SDK (`@handcash/sdk`) currently focuses on Connect endpoints. Items/Minter APIs shown below reference the previous package and will be updated in a subsequent v3 release. You can keep using the existing Items flows until the v3 endpoints are published.
@@ -13,14 +13,14 @@ The v3 SDK (`@handcash/sdk`) currently focuses on Connect endpoints. Items/Minte
 
 ## Setting Up Credentials
 
-1. Create an application using the [HandCash Developer Dashboard](/developer-dashboard).
+1. Create an application using the [Handcash Developer Dashboard](/developer-dashboard).
    - Save your `AppId` and `AppSecret`.
 2. Set up a [Business Wallet](/business-wallet/getting-started).
    - Save your `AccessToken`.
 
 ## Item Creation Orders
 
-HandCash Items supports two types of creation orders:
+Handcash Items supports two types of creation orders:
 1. Collection creation orders
 2. Collection item creation orders
 
@@ -50,10 +50,9 @@ interface ItemCreationOrderResponse {
 To create a collection, use the following code and save your `collectionId` for future item creation:
 
 ```typescript
-// Pending v3: still using legacy package for Items until v3 update
-import { HandCashMinter, Types } from "@handcash/handcash-connect";
+import { Items } from "@handcash/sdk";
 
-const handCashMinter = HandCashMinter.fromAppCredentials({
+const itemsClient = Items.fromAppCredentials({
   appId: handCashConfig.appId,
   authToken: handCashConfig.authToken,
   appSecret: handCashConfig.appSecret,
@@ -61,8 +60,8 @@ const handCashMinter = HandCashMinter.fromAppCredentials({
 
 async function createCollection() {
   const collection: Types.CreateCollectionOrder = {
-    name: 'HandCash Team Caricatures',
-    description: 'A unique collection of caricatures of the HandCash team',
+    name: 'Handcash Team Caricatures',
+    description: 'A unique collection of caricatures of the Handcash team',
     mediaDetails: {
       image: {
         url: 'https://res.cloudinary.com/handcash-iae/image/upload/v1685141160/round-handcash-logo_cj47fp_xnteyo_oy3nbd.png',
@@ -71,12 +70,12 @@ async function createCollection() {
     },
   };
 
-  const creationOrder = await handCashMinter.createCollectionOrder(collection);
+  const creationOrder = await itemsClient.createCollectionOrder(collection);
   
   // Wait for collection to be created in the background
   await new Promise(resolve => setTimeout(resolve, 5000));
   
-  const items = await handCashMinter.getOrderItems(creationOrder.id);
+  const items = await itemsClient.getOrderItems(creationOrder.id);
   console.log(`Collection Created. ID: ${items[0].id}`);
 }
 

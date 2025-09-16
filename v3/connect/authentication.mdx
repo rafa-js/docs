@@ -1,0 +1,96 @@
+---
+title: Authentication
+description: 'Authenticate users and manage permissions with Handcash Connect'
+---
+
+## Suggested Prerequisites
+- Handcash Developer Dashboard account
+- Node.js application setup
+- HTTPS-enabled server for redirect URLs
+- Secure session/token storage system
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate user authentication from the v3 SDK: https://docs.handcash.io/v3/connect/authentication
+```
+
+## User Authentication Flow
+
+### 1. Generate Authorization URL
+
+```typescript
+import { getInstance } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'YOUR_APP_ID',
+  appSecret: 'YOUR_APP_SECRET',
+});
+
+// Generate redirect URL
+const authUrl = sdk.getRedirectionUrl();
+console.log('Redirect user to:', authUrl);
+
+// With custom state parameter
+const authUrlWithState = sdk.getRedirectionUrl({ state: 'custom-state' });
+```
+
+### 2. Handle User Authorization
+
+After the user authorizes your app, they'll be redirected back with an `authToken`:
+
+```typescript
+// In your callback handler
+app.get('/auth/callback', (req, res) => {
+  const authToken = req.query.authToken;
+  
+  if (authToken) {
+    // Store the token securely
+    // Redirect to your app
+    res.redirect('/');
+  } else {
+    // Handle authorization failure
+    res.redirect('/auth/error');
+  }
+});
+```
+
+### 3. Create User Client
+
+```typescript
+import { getInstance, Connect } from '@handcash/sdk';
+
+const sdk = getInstance({ appId, appSecret });
+const client = sdk.getAccountClient(authToken);
+
+// Now you can use the client for user operations
+const profile = await Connect.getCurrentUserProfile({ client });
+```
+
+## Check User Permissions
+
+```typescript
+const permissions = await Connect.getPermissions({ client });
+console.log('User granted permissions:', permissions);
+```
+
+## Error Handling
+
+```typescript
+try {
+  const client = sdk.getAccountClient(authToken);
+  const profile = await Connect.getCurrentUserProfile({ client });
+} catch (error) {
+  if (error.message.includes('Invalid token')) {
+    // Token expired or invalid, redirect to re-authenticate
+    res.redirect(sdk.getRedirectionUrl());
+  }
+}
+```
+
+## Security Best Practices
+
+- **Store tokens securely** - Use encrypted storage or secure sessions
+- **Use HTTPS** - Always use HTTPS for redirect URLs
+- **Validate tokens** - Check token validity before making API calls
+- **Handle expiration** - Implement token refresh logic

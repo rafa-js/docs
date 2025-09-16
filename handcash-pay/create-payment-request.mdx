@@ -1,154 +1,126 @@
 ---
 title: Create Payment Request
-description: 'This endpoint allows you to create a payment request using HandCash. There are three types of payment requests:'
+description: 'Generate payment requests with QR codes and payment links'
 ---
 
-1. Payment requests that do not expire on payment (e.g., a link or QR code for donations)
-2. Payment requests that expire on payment (e.g., a digital item or a unique physical product)
-3. Limit orders that expire after a set number of purchases (e.g., a limited edition card drop)
-
-## API Endpoint
-
-- **Method**: POST
-- **URL**: `https://cloud.handcash.io/v3/paymentRequests`
-
-## Headers
-
-```
-Accept: application/json
-Content-Type: application/json
-App-Id: your-app-id
-App-Secret: your-app-secret
-```
-
-## Request Parameters
+## Create Basic Payment Request
 
 ```typescript
-interface CreatePaymentRequestParams {
-  product: {
-    name: string;
-    description?: string;
-    imageUrl?: string;
-  };
-  instrumentCurrencyCode: string;
-  denominationCurrencyCode?: string;
-  receivers: {
-    sendAmount: number;
-    destination: string;
-  }[];
-  requestedUserData?: string[];
-  redirectUrl?: string;
-  notifications?: {
-    webhook?: {
-      webhookUrl: string;
-      customParameters?: Record<string, any>;
-    };
-    email?: string;
-  };
-  expirationType: 'limit' | 'never' | 'onPaymentCompleted';
-  totalUnits?: number;
-  expirationInSeconds?: number;
-  enabledAt?: string; // ISO date string
+import { getInstance } from '@handcash/sdk';
+
+const sdk = getInstance({
+  appId: 'your-app-id',
+  appSecret: 'your-app-secret'
+});
+
+const paymentRequest = await sdk.createPaymentRequest({
+  amount: 25.00,
+  currency: 'USD',
+  description: 'Payment for premium subscription',
+  redirectUrl: 'https://yoursite.com/payment-success',
+  cancelUrl: 'https://yoursite.com/payment-cancelled'
+});
+
+console.log('Payment URL:', paymentRequest.paymentUrl);
+console.log('QR Code Data:', paymentRequest.qrCode);
+console.log('Request ID:', paymentRequest.id);
+```
+
+## Payment Request with Items
+
+```typescript
+const paymentRequest = await sdk.createPaymentRequest({
+  amount: 50.00,
+  currency: 'USD',
+  description: 'Purchase digital items',
+  items: [
+    {
+      name: 'Premium Sword',
+      description: 'Legendary weapon',
+      quantity: 1,
+      price: 30.00
+    },
+    {
+      name: 'Health Potion',
+      description: 'Restores 100 HP',
+      quantity: 2,
+      price: 10.00
+    }
+  ],
+  redirectUrl: 'https://yoursite.com/purchase-success'
+});
+```
+
+## Custom Payment Request
+
+```typescript
+const paymentRequest = await sdk.createPaymentRequest({
+  amount: 100.00,
+  currency: 'USD',
+  description: 'Custom payment request',
+  customData: {
+    orderId: 'ORDER-12345',
+    customerId: 'CUST-67890',
+    metadata: {
+      source: 'mobile-app',
+      campaign: 'summer-sale'
+    }
+  },
+  redirectUrl: 'https://yoursite.com/order-complete',
+  cancelUrl: 'https://yoursite.com/order-cancelled',
+  expiresAt: new Date(Date.now() + 30 * 60 * 1000) // 30 minutes
+});
+```
+
+## Display QR Code
+
+```typescript
+// Generate QR code for display
+const qrCodeData = paymentRequest.qrCode;
+
+// In your frontend
+<img src={`data:image/png;base64,${qrCodeData}`} alt="Payment QR Code" />
+
+// Or use a QR code library
+import QRCode from 'qrcode';
+
+const qrCodeUrl = await QRCode.toDataURL(paymentRequest.paymentUrl);
+```
+
+## Payment Request Response
+
+```typescript
+{
+  "id": "pr_123456789",
+  "paymentUrl": "https://pay.handcash.io/pr_123456789",
+  "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+  "amount": 25.00,
+  "currency": "USD",
+  "description": "Payment for premium subscription",
+  "status": "pending",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "expiresAt": "2024-01-15T11:00:00Z"
 }
 ```
 
-### Parameter Details
-
-- `product`: Details of the product or service being paid for.
-- `instrumentCurrencyCode`: The currency code for the payment (e.g., 'BSV').
-- `denominationCurrencyCode`: Optional. The currency for price denomination if different from `instrumentCurrencyCode`.
-- `receivers`: Array of payment recipients, including amount and destination.
-- `requestedUserData`: Optional. Array of user data fields to request.
-- `redirectUrl`: Optional. URL to redirect the user after payment.
-- `notifications`: Optional. Webhook and email notification settings.
-- `expirationType`: Type of expiration for the payment request.
-- `totalUnits`: Required if `expirationType` is 'limit'. The total number of times the payment can be made.
-- `expirationInSeconds`: Optional. Time in seconds until the request expires.
-- `enabledAt`: Optional. ISO date string for when the request becomes active.
-
-## Example Request
-
-```bash
-curl --request POST \
-     --url https://cloud.handcash.io/v3/paymentRequests \
-     --header 'Accept: application/json' \
-     --header 'Content-Type: application/json' \
-     --header 'App-Id: your-app-id' \
-     --header 'App-Secret: your-app-secret' \
-     --data '{
-          "product": {
-               "name": "Legendary Sword",
-               "description": "A sword made of lighting",
-               "imageUrl": "https://example.com/sword-image.jpg"
-          },
-          "receivers": [
-               {
-                    "sendAmount": 0.01,
-                    "destination": "myBusinessWalletId"
-               }
-          ],
-         "requestedUserData": ["paymail"],
-          "notifications": {
-               "webhook": {
-                    "customParameters": {
-                         "gameId": "199491921"
-                    },
-                    "webhookUrl": "https://myappdomain.com/handcash/webhook"
-               },
-               "email": "payments@handcash.io"
-          },
-          "currencyCode": "BSV",
-          "denominatedIn": "USD",
-          "expirationType": "limit",
-          "totalUnits": 5,
-          "expirationInSeconds": 604800,
-          "redirectUrl": "https://market.handcash.io/my-account/items/inventory/647a2e8e84940994f6aeb634?collectionId=659ddbeef30153e01217307e&sortBy=price&order=asc&page=1"
-     }'
-```
-
-## Response Type
+## Error Handling
 
 ```typescript
-interface PaymentRequestResponse {
-  id: string;
-  paymentRequestUrl: string;
-  paymentRequestQrCodeUrl: string;
-  isEnabled: boolean;
-  product: {
-    name: string;
-    description: string;
-    imageUrl: string;
-  };
-  receivers: {
-    sendAmount: number;
-    destination: string;
-  }[];
-  notifications: {
-    webhook: {
-      webhookUrl: string;
-      customParameters?: Record<string, any>;
-    };
-    email?: string;
-  };
-  requestedUserData: [string],
-  redirectUrl: string;
-  expirationType: string;
-  totalUnits: number;
-  remainingUnits: number;
-  expiresAt: string;
-  createdAt: string;
+try {
+  const paymentRequest = await sdk.createPaymentRequest({
+    amount: 25.00,
+    currency: 'USD',
+    description: 'Payment request'
+  });
+} catch (error) {
+  if (error.code === 'INVALID_AMOUNT') {
+    console.log('Amount must be greater than 0');
+  } else if (error.code === 'INVALID_CURRENCY') {
+    console.log('Currency not supported');
+  } else if (error.code === 'INVALID_REDIRECT_URL') {
+    console.log('Redirect URL must be HTTPS');
+  } else {
+    console.log('Payment request creation failed:', error.message);
+  }
 }
 ```
-
-## Important Notes
-
-- The payment request in this example has a single receiver.
-- It will expire in 604800 seconds (one week).
-- The service will receive the user's paymail in the body of the webhook notification.
-- Custom parameters (e.g., `gameId`) will be included in the webhook notification.
-- This payment request expires after 5 payments due to `"expirationType": "limit"` and `"totalUnits": 5`.
-- HandCash will notify the server for each successful payment via the specified webhook URL.
-- Email notifications will be sent for each successful payment.
-- Users will be redirected to the `redirectUrl` after completing the payment.
-- The redirect URL will include the `transactionId` as a query parameter.
-- Developers can use the redirect URL pattern to send users to specific collections of digital items.

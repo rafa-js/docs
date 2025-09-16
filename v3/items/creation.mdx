@@ -1,0 +1,297 @@
+---
+title: Create Items
+description: 'Create and manage digital items with Handcash Items'
+---
+
+## Suggested Prerequisites
+- Business wallet credentials
+- Item metadata and media assets
+- Collection management system
+- Item creation workflow
+
+## Suggested Prompt
+
+```text
+Read this documentation then integrate item creation from the v3 SDK: https://docs.handcash.io/v3/items/creation
+```
+
+## Prerequisites
+
+To create items, you need:
+- Business wallet credentials
+- Collection ID
+- Item metadata and media
+
+## Create Items Order
+
+### Basic Item Creation
+
+```typescript
+import { Items } from '@handcash/sdk';
+
+const itemsClient = Items.fromAppCredentials({
+  appId: 'YOUR_APP_ID',
+  authToken: 'YOUR_AUTH_TOKEN', // Business wallet token
+  appSecret: 'YOUR_APP_SECRET'
+});
+
+const creationOrder = await itemsClient.createItemsOrder({
+  collectionId: 'collection-id-here',
+  items: [
+    {
+      name: 'Legendary Sword',
+      description: 'A powerful weapon forged in dragon fire',
+      rarity: 'Legendary',
+      quantity: 1,
+      color: '#FF4500',
+      attributes: [
+        { name: 'Attack', value: '100', displayType: 'number' },
+        { name: 'Element', value: 'Fire', displayType: 'string' },
+        { name: 'Durability', value: '95', displayType: 'number' }
+      ],
+      mediaDetails: {
+        image: {
+          url: 'https://example.com/sword.png',
+          contentType: 'image/png'
+        }
+      }
+    }
+  ]
+});
+
+console.log('Items order created:', creationOrder.id);
+```
+
+### Create Multiple Items
+
+```typescript
+const creationOrder = await itemsClient.createItemsOrder({
+  collectionId: 'collection-id-here',
+  items: [
+    {
+      name: 'Health Potion',
+      rarity: 'Common',
+      quantity: 10,
+      color: '#00FF00',
+      attributes: [
+        { name: 'Healing', value: '50', displayType: 'number' },
+        { name: 'Type', value: 'Consumable', displayType: 'string' }
+      ],
+      mediaDetails: {
+        image: {
+          url: 'https://example.com/potion.png',
+          contentType: 'image/png'
+        }
+      }
+    },
+    {
+      name: 'Magic Ring',
+      rarity: 'Rare',
+      quantity: 1,
+      color: '#800080',
+      attributes: [
+        { name: 'Magic Power', value: '75', displayType: 'number' },
+        { name: 'Enchantment', value: 'Protection', displayType: 'string' }
+      ],
+      mediaDetails: {
+        image: {
+          url: 'https://example.com/ring.png',
+          contentType: 'image/png'
+        }
+      }
+    }
+  ]
+});
+```
+
+### Items with 3D Models
+
+```typescript
+const creationOrder = await itemsClient.createItemsOrder({
+  collectionId: 'collection-id-here',
+  items: [
+    {
+      name: '3D Dragon',
+      rarity: 'Epic',
+      quantity: 1,
+      color: '#FF0000',
+      attributes: [
+        { name: 'Size', value: 'Large', displayType: 'string' },
+        { name: 'Power', value: '1000', displayType: 'number' }
+      ],
+      mediaDetails: {
+        image: {
+          url: 'https://example.com/dragon-thumb.png',
+          contentType: 'image/png'
+        },
+        multimedia: {
+          url: 'https://example.com/dragon-model.glb',
+          contentType: 'application/glb'
+        }
+      }
+    }
+  ]
+});
+```
+
+### Items with Actions
+
+```typescript
+const creationOrder = await itemsClient.createItemsOrder({
+  collectionId: 'collection-id-here',
+  items: [
+    {
+      name: 'Mystery Box',
+      rarity: 'Rare',
+      quantity: 1,
+      color: '#FFD700',
+      attributes: [
+        { name: 'Type', value: 'Container', displayType: 'string' }
+      ],
+      mediaDetails: {
+        image: {
+          url: 'https://example.com/mystery-box.png',
+          contentType: 'image/png'
+        }
+      },
+      actions: [
+        {
+          name: 'Open',
+          description: 'Open this box to reveal random items',
+          url: 'https://yourgame.com/open-box',
+          enabled: true
+        }
+      ]
+    }
+  ]
+});
+```
+
+## Item Creation Types
+
+### CreateItemMetadata
+
+```typescript
+interface CreateItemMetadata {
+  name: string;
+  description?: string;
+  rarity?: string;
+  quantity: number;
+  color?: string;
+  attributes: ItemAttributeMetadata[];
+  mediaDetails: MediaDetails;
+  actions?: Action[];
+  groupingValue?: string;
+  externalId?: string;
+  user?: string; // If not provided, items go to business wallet
+}
+
+interface ItemAttributeMetadata {
+  name: string;
+  value: string | number;
+  displayType: 'string' | 'number' | 'date';
+}
+
+interface MediaDetails {
+  image: File;
+  multimedia?: File; // For 3D models
+}
+
+interface File {
+  url: string;
+  contentType: string;
+}
+
+interface Action {
+  name: string;
+  description: string;
+  url: string;
+  enabled?: boolean;
+}
+```
+
+## Common Use Cases
+
+### Game Item Generator
+
+```typescript
+async function generateGameItems(collectionId: string, itemCount: number) {
+  const items = [];
+  
+  for (let i = 0; i < itemCount; i++) {
+    const rarity = ['Common', 'Rare', 'Epic', 'Legendary'][Math.floor(Math.random() * 4)];
+    const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF'];
+    
+    items.push({
+      name: `Generated Item ${i + 1}`,
+      rarity,
+      quantity: 1,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      attributes: [
+        { name: 'Level', value: Math.floor(Math.random() * 100), displayType: 'number' },
+        { name: 'Type', value: 'Generated', displayType: 'string' }
+      ],
+      mediaDetails: {
+        image: {
+          url: `https://example.com/generated-${i}.png`,
+          contentType: 'image/png'
+        }
+      }
+    });
+  }
+  
+  return await itemsClient.createItemsOrder({
+    collectionId,
+    items
+  });
+}
+```
+
+### Batch Item Creation
+
+```typescript
+async function createItemBatch(collectionId: string, itemTemplates: any[]) {
+  const items = itemTemplates.map(template => ({
+    name: template.name,
+    rarity: template.rarity,
+    quantity: template.quantity,
+    color: template.color,
+    attributes: template.attributes,
+    mediaDetails: template.mediaDetails,
+    externalId: template.externalId // For tracking in your system
+  }));
+  
+  return await itemsClient.createItemsOrder({
+    collectionId,
+    items
+  });
+}
+```
+
+## Error Handling
+
+```typescript
+try {
+  const creationOrder = await itemsClient.createItemsOrder({
+    collectionId,
+    items: [/* item data */]
+  });
+} catch (error) {
+  if (error.message.includes('Invalid collection')) {
+    console.log('Collection ID is invalid');
+  } else if (error.message.includes('Insufficient permissions')) {
+    console.log('Business wallet needs item creation permissions');
+  } else if (error.message.includes('Invalid media')) {
+    console.log('Media URL or content type is invalid');
+  }
+}
+```
+
+## Best Practices
+
+- **Use external IDs** to track items in your system
+- **Validate media URLs** before creating items
+- **Set appropriate rarity levels** for your game economy
+- **Use meaningful attribute names** for filtering
+- **Test item actions** before deploying
+- **Monitor creation orders** for completion status

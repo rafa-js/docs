@@ -1,34 +1,33 @@
 ---
 title: Getting Started
-description: 'Create and manage users wallet with only email verification without the user ever leaving your application'
+description: 'Build native wallet infrastructure into your application with email-based user onboarding'
 ---
 
-## Set up
+## Setup
 
-To get started with Wallet API:
+To integrate wallet infrastructure:
 
 1. Create an application in the [Developer Dashboard](/developer-dashboard)
 
 2. Save your `AppSecret` and `AppId` for later use
 
-3. Reach out to [sales@handcash.io](mailto:sales@handcash.io) to enable this feature with your application id
+3. Contact [sales@handcash.io](mailto:sales@handcash.io) to enable wallet creation with your application ID
 
-4. Install the HandCash SDK in your project:
+4. Install the Handcash SDK in your project:
 
 ```
-npm install --save @handcash/handcash-sdk
+npm install @handcash/sdk
 ```
 
 ## Overview
 
-HandCash Wallet Service enables you to create wallets for your users using just email verification. With the HandCash SDK, you can initiate the process of sending a verification code to your user's email address.
+The Wallet API provides whitelabel wallet infrastructure that integrates directly into your application. Users can be onboarded with just email verification, creating a seamless native experience.
 
-Once set up, this wallet allows you to:
+Core capabilities:
 
-* Check balance
+* **User onboarding** - Email-based account creation
+* **Balance management** - Check and track user balances
+* **Payment processing** - Send and receive payments
+* **Transaction history** - Complete payment records
 
-* Retrieve transaction history
-
-* Make payments
-
-The key advantage is that users can perform all these actions without leaving your application.
+All wallet functionality operates within your application's interface, maintaining user context and experience.

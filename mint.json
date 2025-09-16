@@ -1,6 +1,6 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "HandCash Developer Documentation",
+  "name": "Handcash Developer Documentation",
   "logo": {
     "dark": "/logo/handcash_overDark.svg",
     "light": "/logo/handcash_overLight.svg"
@@ -30,7 +30,7 @@
     {
       "name": "Community",
       "icon": "discord",
-      "url": "https://discord.gg/aKpjBgAh"
+      "url": "https://discord.handcash.io"
     },
     {
       "name": "Blog",
@@ -47,79 +47,41 @@
       ]
     },
     {
+      "group": "v3 / Getting Started",
+      "pages": [
+        "v3/getting-started"
+      ]
+    },
+    {
+      "group": "v3 / Connect",
+      "pages": [
+        "v3/connect/authentication",
+        "v3/connect/user-creation",
+        "v3/connect/profiles"
+      ]
+    },
+    {
+      "group": "v3 / Payments",
+      "pages": [
+        "v3/connect/payments"
+      ]
+    },
+    {
+      "group": "v3 / Items",
+      "pages": [
+        "v3/items/inventory",
+        "v3/items/creation",
+        "v3/items/transfers"
+      ]
+    },
+    {
       "group": "v3 / Business Wallet",
       "pages": [
-        "v3/business-wallet/getting-started"
-      ]
-    },
-    {
-      "group": "v3 / User Connection",
-      "pages": [
-        "v3/handcash-connect/getting-started",
-        "v3/handcash-connect/permissions",
-        "v3/handcash-connect/profile",
-        "v3/handcash-connect/friends",
-        "v3/handcash-connect/read-balance"
-      ]
-    },
-    {
-      "group": "v3 / Item Engine",
-      "pages": [
-        "v3/handcash-items/getting-started",
-        "v3/handcash-items/collection-management",
-        "v3/handcash-items/create-item",
-        "v3/handcash-items/send-item",
-        "v3/handcash-items/burn-item",
-        "v3/handcash-items/read-inventory"
-      ]
-    },
-    {
-      "group": "v3 / Embedded Payments",
-      "pages": [
-        "v3/embedded-payments/getting-started",
-        "v3/embedded-payments/send",
-        "v3/embedded-payments/connect-limit"
+        "v3/business-wallet/payouts"
       ]
     },
     {
       "group": "v3 / Payment Requests",
-      "pages": [
-        "v3/handcash-pay/getting-started"
-      ]
-    },
-    {
-      "group": "v3 / Store Integration",
-      "pages": [
-        "v3/wallet-api/getting-started"
-      ]
-    },
-    {
-      "group": "Handcash Connect",
-      "pages": [
-        "handcash-connect/getting-started",
-        "handcash-connect/account",
-        "handcash-connect/wallet"
-      ]
-    },
-    {
-      "group": "Items",
-      "pages": [
-        "handcash-items/getting-started",
-        "handcash-items/create-items",
-        "handcash-items/manage-items",
-        "handcash-items/craft-items",
-        "handcash-items/webhooks",
-        "handcash-items/market"
-      ]
-    },
-    {
-      "group": "Business Wallet",
-      "pages": [
-        "business-wallet/getting-started"
-      ]
-    },
-    {
-      "group": "Payment Requests",
       "pages": [
         "handcash-pay/getting-started",
         "handcash-pay/create-payment-request",
@@ -128,7 +90,7 @@
       ]
     },
     {
-      "group": "Wallet API",
+      "group": "Wallet API / Whilelabel Services",
       "pages": [
         "wallet-api/getting-started",
         "wallet-api/create-user-account",
@@ -139,21 +101,6 @@
         "wallet-api/on-ramps"
       ]
     },
-    {
-      "group": "Use Cases and Examples",
-      "pages": [
-        "useCases/open-card-pack",
-        "useCases/sell-items",
-        "useCases/items-minter",
-        "useCases/external-wallet-demo"
-      ]
-    },
-    {
-      "group": "Miscellaneous",
-      "pages": [
-        "miscellaneous/authentication"
-      ]
-    }
   ],
   "footerSocials": {
     "x": "https://twitter.com/handcashapp",

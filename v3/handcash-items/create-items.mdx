@@ -1,18 +1,18 @@
 ---
 title: Create Items
-description: 'Creating Items with the HandCash SDK'
+description: 'Creating Items with the Handcash SDK'
 ---
 
-This guide explains how to create items using your business wallet credentials with the HandCash SDK.
+This guide explains how to create items using your business wallet credentials with the Handcash SDK.
 
 ## Setup
 
-First, import the necessary module and initialize the HandCash Minter:
+First, import the necessary module and initialize the Handcash Minter:
 
 ```typescript
-import { HandCashMinter } from '@handcash/handcash-connect';
+import { Items } from '@handcash/sdk';
 
-const handCashMinter = HandCashMinter.fromAppCredentials({
+const itemsClient = Items.fromAppCredentials({
   appId: process.env.HANDCASH_APP_ID,
   authToken: process.env.HANDCASH_AUTH_TOKEN,
   appSecret: process.env.HANDCASH_APP_SECRET
@@ -27,7 +27,7 @@ Use the `createItemsOrder` method to create new items:
 async function createItems() {
   const collectionId = "657762fc2acbecc109d8c1fb";
 
-  const creationOrder = await handCashMinter.createItemsOrder({
+  const creationOrder = await itemsClient.createItemsOrder({
     collectionId,
     items: [
       {
@@ -146,7 +146,7 @@ export type ItemAttributeMetadata = {
 
 ## Item Actions
 
-Item actions allow users to interact with your game from HandCash. Here's an example of creating an item with an action:
+Item actions allow users to interact with your game from Handcash. Here's an example of creating an item with an action:
 
 ```typescript
 const creationOrder = await handCashMinter.createItemsOrder({
@@ -181,6 +181,6 @@ const creationOrder = await handCashMinter.createItemsOrder({
 
 2. Capture these parameters in your application.
 
-3. Use the `authToken` to leverage the HandCash Connect SDK for operations like transferring items, crafting and burning items, or transferring money.
+3. Use the `authToken` to leverage the Handcash Connect SDK for operations like transferring items, crafting and burning items, or transferring money.
 
 An example use case will be illustrated in [crafting items](/handcash-items/craft-items)
